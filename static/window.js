@@ -3,9 +3,13 @@
 window.onload = async () => {
     try {
         const resp = await fetch('/api/cards')
-        const cards = await resp.json()
+        const data = await resp.json()
 
-        cards.forEach(c => deck.appendChild(Row(c)))
+        if (!resp.ok) {
+            throw new Error(data.error)
+        }
+
+        data.forEach(c => deck.appendChild(Row(c)))
     } catch (e) {
         console.error(e)
     }
