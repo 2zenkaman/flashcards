@@ -3,15 +3,15 @@
 import Row from "./row.js";
 
 const form = document.querySelector('form')
-const deck = document.querySelector('#flashcards-deck')
+const deck = document.querySelector('#flashcards-deck > tbody')
 
 // document.querySelector('form').addEventListener('submit', (ev) => {...})
 form.onsubmit = async (ev) => {
     ev.preventDefault()
 
     const req = {
-        question: document.querySelector('form > input[name="face"]').value,
-        answer:   document.querySelector('form > input[name="back"]').value,
+        question: document.querySelector('form > input[name="question"]').value,
+        answer:   document.querySelector('form > input[name="answer"]').value,
     }
 
     try {
@@ -27,7 +27,7 @@ form.onsubmit = async (ev) => {
             throw new Error(resp.statusText)
         }
 
-        const card = await resp.json();
+        const card = await resp.json()
 
         deck.appendChild(Row(card))
     } catch (e) {
@@ -35,3 +35,14 @@ form.onsubmit = async (ev) => {
         return
     }
 }
+
+window.onload = async () => {
+    try {
+        const resp = await fetch('/api/cards')
+        const cards = await resp.json()
+
+        cards.forEach(c => deck.appendChild(Row(c)))
+    } catch (e) {
+        console.error(e)
+    }
+} 
