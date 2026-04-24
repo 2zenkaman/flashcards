@@ -1,21 +1,23 @@
 package handlers
 
 import (
-	"encoding/json"
 	"flashcards/models"
+	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
-func HandleCreateCard() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func HandleCreateCard() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
 		var req struct {
 			Question string `json:"question"`
 			Answer   string `json:"answer"`
 		}
 
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Errorf("Invalid body request: %v", err)})
 			return
 		}
 
@@ -25,61 +27,56 @@ func HandleCreateCard() http.HandlerFunc {
 		}
 
 		if err := card.Create(); err != nil {
-			http.Error(w, "Failed to create card: "+err.Error(), http.StatusInternalServerError)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("Failed to create card: %v", err)})
 			return
 		}
 
-		w.WriteHeader(http.StatusCreated)
-		w.Header().Add("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(card)
+		ctx.JSON(http.StatusCreated, card)
 	}
 }
 
-func HandleGetAllCards() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func HandleGetAllCards() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
 		cards, err := models.GetAllCards()
 		if err != nil {
-			http.Error(w, "Failed to retrieve cards: "+err.Error(), http.StatusInternalServerError)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("Failed to get cards: %v", err)})
 			return
 		}
 
-		w.Header().Add("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(cards)
+		ctx.JSON(http.StatusOK, cards)
 	}
 }
 
-func HandleUpdateCard() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func HandleUpdateCard() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
 		var card models.Card
-		if err := json.NewDecoder(r.Body).Decode(&card); err != nil {
-			http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
+		if err := ctx.ShouldBindJSON(&card); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Errorf("Invalid body request: %v", err)})
 			return
 		}
 
 		if err := models.UpdateCard(&card); err != nil {
-			http.Error(w, "Failed to update card: "+err.Error(), http.StatusInternalServerError)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("Failed to update card: %v", err)})
 			return
 		}
 
-		w.Header().Add("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(card)
+		ctx.JSON(http.StatusOK, card)
 	}
 }
 
-func HandleDeleteCard() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(r.PathValue("id"))
+func HandleDeleteCard() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
-			http.Error(w, "Failed to parse id: "+err.Error(), http.StatusBadRequest)
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Errorf("Failed to parse id: %v", err)})
 			return
 		}
 
 		if err := models.DeleteCard(id); err != nil {
-			http.Error(w, "Failed to delete card: "+err.Error(), http.StatusInternalServerError)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("Failed to delete card: %v", err)})
 			return
 		}
 
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
+		ctx.Status(http.StatusNoContent)
 	}
 }
