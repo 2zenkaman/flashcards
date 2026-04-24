@@ -14,10 +14,12 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /api/cards", handlers.HandleCreateCard())
-	mux.HandleFunc("GET /api/cards", handlers.HandleGetAllCards())
-	mux.HandleFunc("PUT /api/cards", handlers.HandleUpdateCard())
-	mux.HandleFunc("DELETE /api/cards/{id}", handlers.HandleDeleteCard())
+	mux.Handle("GET /", http.FileServer(http.Dir("./static")))
+
+	mux.Handle("POST /api/cards", handlers.HandleCreateCard())
+	mux.Handle("GET /api/cards", handlers.HandleGetAllCards())
+	mux.Handle("PUT /api/cards", handlers.HandleUpdateCard())
+	mux.Handle("DELETE /api/cards/{id}", handlers.HandleDeleteCard())
 
 	http.ListenAndServe(":8080", mux)
 }
