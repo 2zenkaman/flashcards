@@ -1,5 +1,7 @@
 "use strict";
 
+import Row from "./row.js";
+
 window.onload = async () => {
     try {
         const resp = await fetch('/api/cards')
