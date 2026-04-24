@@ -10,8 +10,8 @@ form.onsubmit = async (ev) => {
     ev.preventDefault()
 
     const req = {
-        question: document.querySelector('form > input[name="question"]').value,
-        answer:   document.querySelector('form > input[name="answer"]').value,
+        question: document.querySelector('form input[name="question"]').value,
+        answer:   document.querySelector('form input[name="answer"]').value,
     }
 
     try {
@@ -28,8 +28,9 @@ form.onsubmit = async (ev) => {
         }
 
         const card = await resp.json()
-
         deck.appendChild(Row(card))
+
+        form.querySelectorAll('input').forEach(i => i.value = '')
     } catch (e) {
         console.error(e)
         return
