@@ -2,11 +2,14 @@ package models
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var conn *pgxpool.Pool
+
+var DatabaseNilError = errors.New("database is not connected")
 
 func InitDB() error {
 	var err error
