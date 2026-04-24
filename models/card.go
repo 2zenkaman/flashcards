@@ -18,7 +18,7 @@ func (c *Card) Create() error {
 		return DatabaseNilError
 	}
 
-	err := conn.QueryRow(context.Background(), "INSERT INTO cards (question, answer) VALUES ($1, $2) RETURNING id, learned;", c.Question, c.Answer).Scan(&c.ID, &c.Learned)
+	err := conn.QueryRow(context.Background(), "INSERT INTO cards (question, answer) VALUES ($1, $2) RETURNING id, learned", c.Question, c.Answer).Scan(&c.ID, &c.Learned)
 	return err
 }
 
@@ -27,7 +27,7 @@ func GetAllCards() ([]Card, error) {
 		return nil, DatabaseNilError
 	}
 
-	rows, err := conn.Query(context.Background(), "SELECT id, question, answer, learned FROM cards")
+	rows, err := conn.Query(context.Background(), "SELECT id, question, answer, learned FROM cards ORDER BY id")
 	if err != nil {
 		return nil, err
 	}
