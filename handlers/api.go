@@ -22,7 +22,6 @@ func HandleCreateCard() http.HandlerFunc {
 		card := models.Card{
 			Question: req.Question,
 			Answer:   req.Answer,
-			Learned:  false,
 		}
 
 		if err := card.Create(); err != nil {
