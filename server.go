@@ -21,7 +21,7 @@ func main() {
 	engine.Handle("POST", "/api/cards", handlers.HandleCreateCard())
 	engine.Handle("GET", "/api/cards", handlers.HandleGetAllCards())
 	engine.Handle("PUT", "/api/cards", handlers.HandleUpdateCard())
-	engine.Handle("DELETE", "/api/cards/{id}", handlers.HandleDeleteCard())
+	engine.Handle("DELETE", "/api/cards/:id", handlers.HandleDeleteCard())
 
 	engine.Run(":8080")
 }
