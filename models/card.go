@@ -33,7 +33,7 @@ func GetAllCards() ([]Card, error) {
 	}
 	defer rows.Close()
 
-	var cards []Card
+	cards := make([]Card, 0)
 	for rows.Next() {
 		var c Card
 		if err := rows.Scan(&c.ID, &c.Question, &c.Answer, &c.Learned); err != nil {
