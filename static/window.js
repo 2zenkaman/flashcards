@@ -1,6 +1,8 @@
 "use strict";
 
-import Row from "./row.js";
+import Row from "./row.js"
+
+const deck = document.querySelector('#flashcards-deck > tbody')
 
 window.onload = async () => {
     try {
