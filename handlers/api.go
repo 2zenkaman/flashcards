@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flashcards/models"
 	"net/http"
+	"strconv"
 )
 
 func HandleCreateCard() http.HandlerFunc {
@@ -68,16 +69,13 @@ func HandleUpdateCard() http.HandlerFunc {
 
 func HandleDeleteCard() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req struct {
-			ID int `json:"id"`
-		}
-
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
+		id, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
+			http.Error(w, "Failed to parse id: "+err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		if err := models.DeleteCard(req.ID); err != nil {
+		if err := models.DeleteCard(id); err != nil {
 			http.Error(w, "Failed to delete card: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
