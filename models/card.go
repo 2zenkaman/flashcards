@@ -17,7 +17,7 @@ type NewCardRequest struct {
 // CRUD operations
 
 func (c *Card) Create() error {
-	_, err := conn.Exec(context.Background(), "INSERT INTO cards (question, answer, learned) VALUES ($1, $2, $3)", c.Question, c.Answer, c.Learned)
+	err := conn.QueryRow(context.Background(), "INSERT INTO cards (question, answer, learned) VALUES ($1, $2, $3) RETURNING id;", c.Question, c.Answer, c.Learned).Scan(&c.ID)
 	return err
 }
 
@@ -40,7 +40,7 @@ func GetAllCards() ([]Card, error) {
 }
 
 func UpdateCard(c *Card) error {
-	_, err := conn.Exec(context.Background(), "UPDATE cards SET question=$1, answer=$2, learned=$3 WHERE id=$4", c.Question, c.Answer, c.Learned, c.ID)
+	err := conn.QueryRow(context.Background(), "UPDATE cards SET question=$1, answer=$2, learned=$3 WHERE id=$4 RETURNING question, answer, learned", c.Question, c.Answer, c.Learned, c.ID).Scan(&c.Question, &c.Answer, &c.Learned)
 	return err
 }
 
