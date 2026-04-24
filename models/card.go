@@ -1,6 +1,8 @@
 package models
 
-import "context"
+import (
+	"context"
+)
 
 type Card struct {
 	ID       int    `json:"id"`
@@ -12,11 +14,19 @@ type Card struct {
 // CRUD operations
 
 func (c *Card) Create() error {
+	if conn == nil {
+		return DatabaseNilError
+	}
+
 	err := conn.QueryRow(context.Background(), "INSERT INTO cards (question, answer, learned) VALUES ($1, $2, $3) RETURNING id;", c.Question, c.Answer, c.Learned).Scan(&c.ID)
 	return err
 }
 
 func GetAllCards() ([]Card, error) {
+	if conn == nil {
+		return nil, DatabaseNilError
+	}
+
 	rows, err := conn.Query(context.Background(), "SELECT id, question, answer, learned FROM cards")
 	if err != nil {
 		return nil, err
@@ -35,11 +45,19 @@ func GetAllCards() ([]Card, error) {
 }
 
 func UpdateCard(c *Card) error {
+	if conn == nil {
+		return DatabaseNilError
+	}
+
 	err := conn.QueryRow(context.Background(), "UPDATE cards SET question=$1, answer=$2, learned=$3 WHERE id=$4 RETURNING question, answer, learned", c.Question, c.Answer, c.Learned, c.ID).Scan(&c.Question, &c.Answer, &c.Learned)
 	return err
 }
 
 func DeleteCard(id int) error {
+	if conn == nil {
+		return DatabaseNilError
+	}
+
 	_, err := conn.Exec(context.Background(), "DELETE FROM cards WHERE id=$1", id)
 	return err
 }
