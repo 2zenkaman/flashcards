@@ -1,9 +1,17 @@
 "use strict";
 
 import Row from "./row.js"
+import Window from "./learn.js";
 
 const form = document.querySelector('form')
 const deck = document.querySelector('#flashcards-deck > tbody')
+const windowElement = document.querySelector('#flashcards-window')
+
+const backward = document.querySelector('#backward')
+const forward = document.querySelector('#forward')
+
+let cards = []
+let pointer = 0
 
 window.onload = async () => {
     document.querySelector('form').querySelectorAll('input').forEach(i => i.value = '')
@@ -16,7 +24,15 @@ window.onload = async () => {
             throw new Error(data.error)
         }
 
-        data.forEach(c => deck.appendChild(Row(c)))
+        cards = data
+
+        cards.forEach(c => deck.appendChild(Row(c)))
+
+        if (cards.length === 0) {
+            windowElement.textContent = 'No cards'
+        } else {
+            windowElement.append(Window(cards[pointer]))
+        }
     } catch (e) {
         console.error(e)
     }
@@ -51,6 +67,7 @@ form.onsubmit = async (ev) => {
             data.learned = temp
         }
 
+        cards.push(data)
         deck.appendChild(Row(data))
 
         form.querySelectorAll('input').forEach(i => i.value = '')
@@ -58,4 +75,16 @@ form.onsubmit = async (ev) => {
         console.error(e)
         return
     }
+}
+
+backward.onclick = () => {
+    pointer = (((pointer - 1) % cards.length) + cards.length) % cards.length
+    windowElement.innerHTML = ''
+    windowElement.append(Window(cards[pointer]))
+}
+
+forward.onclick = () => {
+    pointer = (pointer + 1) % cards.length
+    windowElement.innerHTML = ''
+    windowElement.append(Window(cards[pointer]))
 }
