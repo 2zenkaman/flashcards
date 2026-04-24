@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flashcards</title>
+    <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
     <form>
@@ -11,18 +12,19 @@
         <input type="text" name="back">
         <button type="submit">Add</button>
     </form>
-    <div id="flashcards-deck">
-        <!--
-        <div class="flashcards-row">
-            <div class="flashcards-cell cell-1"></div>
-            <div class="flashcards-cell cell-2"></div>
-            <div class="flashcards-cell cell-3"></div>
-            <div class="flashcards-cell cell-4"></div>
-        </div>
-        <div>
-            ...
-        -->
-    </div>
-    <script src="flashcards.js" type="module"></script>
+    <table id="flashcards-deck">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>QUESTION</th>
+                <th>ANSWER</th>
+                <th>LEARNED</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        </tbody>
+    </table>
+    <script src="static/flashcards.js" type="module"></script>
 </body>
 </html>
