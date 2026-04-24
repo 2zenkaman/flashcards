@@ -5,11 +5,11 @@ import Row from "./row.js";
 const form = document.querySelector('form')
 const deck = document.querySelector('#flashcards-deck')
 
-// document.querySelector('form').addEventListener('submit', (ev) => {})
+// document.querySelector('form').addEventListener('submit', (ev) => {...})
 form.onsubmit = async (ev) => {
     ev.preventDefault()
 
-    const card = {
+    const req = {
         question: document.querySelector('form > input[name="face"]').value,
         answer:   document.querySelector('form > input[name="back"]').value,
     }
@@ -20,7 +20,7 @@ form.onsubmit = async (ev) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(card),
+            body: JSON.stringify(req),
         })
 
         if (!resp.ok) {
@@ -31,6 +31,7 @@ form.onsubmit = async (ev) => {
 
         deck.appendChild(Row(card))
     } catch (e) {
+        console.error(e)
         return
     }
 }
