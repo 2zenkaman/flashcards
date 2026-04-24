@@ -23,12 +23,13 @@ form.onsubmit = async (ev) => {
             body: JSON.stringify(req),
         })
 
+        const data = await resp.json()
+
         if (!resp.ok) {
-            throw new Error(resp.statusText)
+            throw new Error(data.error)
         }
 
-        const card = await resp.json()
-        deck.appendChild(Row(card))
+        deck.appendChild(Row(data))
 
         form.querySelectorAll('input').forEach(i => i.value = '')
     } catch (e) {
