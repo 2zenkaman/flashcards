@@ -9,11 +9,6 @@ type Card struct {
 	Learned  bool   `json:"learned"`
 }
 
-type NewCardRequest struct {
-	Question string `json:"question"`
-	Answer   string `json:"answer"`
-}
-
 // CRUD operations
 
 func (c *Card) Create() error {
