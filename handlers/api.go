@@ -14,7 +14,7 @@ func HandleCreateCard() http.HandlerFunc {
 		}
 
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
 			return
 		}
 
@@ -25,7 +25,7 @@ func HandleCreateCard() http.HandlerFunc {
 		}
 
 		if err := card.Create(); err != nil {
-			http.Error(w, "Failed to create card", http.StatusInternalServerError)
+			http.Error(w, "Failed to create card: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -38,7 +38,7 @@ func HandleGetAllCards() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cards, err := models.GetAllCards()
 		if err != nil {
-			http.Error(w, "Failed to retrieve cards", http.StatusInternalServerError)
+			http.Error(w, "Failed to retrieve cards: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -50,12 +50,12 @@ func HandleUpdateCard() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var card models.Card
 		if err := json.NewDecoder(r.Body).Decode(&card); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		if err := models.UpdateCard(&card); err != nil {
-			http.Error(w, "Failed to update card", http.StatusInternalServerError)
+			http.Error(w, "Failed to update card: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -69,11 +69,11 @@ func HandleDeleteCard() http.HandlerFunc {
 			ID int `json:"id"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
 			return
 		}
 		if err := models.DeleteCard(req.ID); err != nil {
-			http.Error(w, "Failed to delete card", http.StatusInternalServerError)
+			http.Error(w, "Failed to delete card: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 		w.WriteHeader(http.StatusNoContent)
