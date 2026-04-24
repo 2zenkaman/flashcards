@@ -1,3 +1,5 @@
+"use strict";
+
 export default function Row({id, question, answer, learned}) {
     const row = document.createElement('tr')
     row.className = "flashcards-row"
@@ -33,10 +35,12 @@ export default function Row({id, question, answer, learned}) {
     row.querySelector('td.cell-delete').append(deleteButton)
 
     const editButton = document.createElement('button')
-    editButton.textContent = 'edit'
+    editButton.textContent = 'Edit'
     editButton.onclick = async () => {
         document.querySelector('form input[name="question"]').value = question
         document.querySelector('form input[name="answer"]').value = answer
+
+        document.querySelector('form').dataset.learned_temp = row.dataset.learned
 
         try {
             const resp = await fetch(`/api/cards/${id}`, {

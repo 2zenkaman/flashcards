@@ -1,0 +1,7 @@
+tr.flashcards-row[data-learned="true"] {
+    background-color: green;
+}
+
+tr.flashcards-row[data-learned="false"] {
+    background-color: yellow;
+}

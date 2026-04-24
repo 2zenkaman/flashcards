@@ -29,6 +29,11 @@ form.onsubmit = async (ev) => {
             throw new Error(data.error)
         }
 
+        const temp = form.dataset.learned_temp
+        if (temp !== 'null') {
+            data.learned = temp
+        }
+
         deck.appendChild(Row(data))
 
         form.querySelectorAll('input').forEach(i => i.value = '')
