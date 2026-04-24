@@ -1,11 +1,12 @@
 export default function Row({id, question, answer, learned}) {
     const row = document.createElement('tr')
     row.className = "flashcards-row"
+    row.dataset.learned = learned
     row.innerHTML = `
         <td class="flashcards-cell cell-id">${id}</td>
         <td class="flashcards-cell cell-question">${question}</td>
         <td class="flashcards-cell cell-answer">${answer}</td>
-        <td class="flashcards-cell cell-learned">${learned}</td>
+        <td class="flashcards-cell cell-learned"></td>
         <td class="flashcards-cell cell-delete"></td>
     `
 
@@ -17,8 +18,10 @@ export default function Row({id, question, answer, learned}) {
                 method: 'DELETE',
             })
 
+            const data = await resp.json()
+
             if (!resp.ok) {
-                throw new Error("Unable to delete")
+                throw new Error(data.error)
             }
 
         } catch (e) {
@@ -27,8 +30,35 @@ export default function Row({id, question, answer, learned}) {
 
         row.remove()
     }
-
     row.querySelector('td.cell-delete').append(deleteButton)
+
+    const switchButton = document.createElement('button')
+    switchButton.textContent = learned ? 'Not learned' : 'Learned'
+    switchButton.onclick = async () => {
+        try {
+            const resp = await fetch(`/api/cards/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    question,
+                    answer,
+                    learned: row.dataset.learned === 'true' ? false : true,
+                })
+            })
+
+            const data = await resp.json();
+
+            if (!resp.ok) {
+                throw new Error(data.error)
+            }
+
+            row.dataset.learned = data.learned
+
+            switchButton.textContent = data.learned ? 'Not learned' : 'Learned'
+        } catch (e) {
+            console.error(e)
+        }
+    }
+    row.querySelector('td.cell-learned').append(switchButton)
 
     return row;
 }
