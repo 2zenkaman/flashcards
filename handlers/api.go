@@ -17,7 +17,7 @@ func HandleCreateCard() gin.HandlerFunc {
 		}
 
 		if err := ctx.ShouldBindJSON(&req); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Errorf("Invalid body request: %v", err)})
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid body request: %v", err)})
 			return
 		}
 
@@ -27,7 +27,7 @@ func HandleCreateCard() gin.HandlerFunc {
 		}
 
 		if err := card.Create(); err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("Failed to create card: %v", err)})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to create card: %v", err)})
 			return
 		}
 
@@ -39,7 +39,7 @@ func HandleGetAllCards() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		cards, err := models.GetAllCards()
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("Failed to get cards: %v", err)})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to get cards: %v", err)})
 			return
 		}
 
@@ -49,14 +49,22 @@ func HandleGetAllCards() gin.HandlerFunc {
 
 func HandleUpdateCard() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var card models.Card
-		if err := ctx.ShouldBindJSON(&card); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Errorf("Invalid body request: %v", err)})
+		id, err := strconv.Atoi(ctx.Param("id"))
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Failed to parse id: %v", err)})
 			return
 		}
 
+		var card models.Card
+		if err := ctx.ShouldBindJSON(&card); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid body request: %v", err)})
+			return
+		}
+
+		card.ID = id
+
 		if err := models.UpdateCard(&card); err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("Failed to update card: %v", err)})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to update card: %v", err)})
 			return
 		}
 
@@ -68,12 +76,12 @@ func HandleDeleteCard() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Errorf("Failed to parse id: %v", err)})
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Failed to parse id: %v", err)})
 			return
 		}
 
 		if err := models.DeleteCard(id); err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Errorf("Failed to delete card: %v", err)})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to delete card: %v", err)})
 			return
 		}
 
