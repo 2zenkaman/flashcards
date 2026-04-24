@@ -7,6 +7,7 @@ export default function Row({id, question, answer, learned}) {
         <td class="flashcards-cell cell-question">${question}</td>
         <td class="flashcards-cell cell-answer">${answer}</td>
         <td class="flashcards-cell cell-learned"></td>
+        <td class="flashcards-cell cell-edit"></td>
         <td class="flashcards-cell cell-delete"></td>
     `
 
@@ -18,9 +19,8 @@ export default function Row({id, question, answer, learned}) {
                 method: 'DELETE',
             })
 
-            const data = await resp.json()
-
             if (!resp.ok) {
+                const data = await resp.json()
                 throw new Error(data.error)
             }
 
@@ -31,6 +31,30 @@ export default function Row({id, question, answer, learned}) {
         row.remove()
     }
     row.querySelector('td.cell-delete').append(deleteButton)
+
+    const editButton = document.createElement('button')
+    editButton.textContent = 'edit'
+    editButton.onclick = async () => {
+        document.querySelector('form input[name="question"]').value = question
+        document.querySelector('form input[name="answer"]').value = answer
+
+        try {
+            const resp = await fetch(`/api/cards/${id}`, {
+                method: 'DELETE',
+            })
+
+            if (!resp.ok) {
+                const data = await resp.json()
+                throw new Error(data.error)
+            }
+
+        } catch (e) {
+            return console.error(e)
+        }
+
+        row.remove()
+    }
+    row.querySelector('td.cell-edit').append(editButton)
 
     const switchButton = document.createElement('button')
     switchButton.textContent = learned ? 'Not learned' : 'Learned'
