@@ -1,6 +1,12 @@
 "use strict";
 
-document.querySelector('form').onsubmit = async (ev) => {
+import Row from "./row.js";
+
+const form = document.querySelector('form')
+const deck = document.querySelector('#flashcards-deck')
+
+// document.querySelector('form').addEventListener('submit', (ev) => {})
+form.onsubmit = async (ev) => {
     ev.preventDefault()
 
     const card = {
@@ -21,7 +27,9 @@ document.querySelector('form').onsubmit = async (ev) => {
             throw new Error(resp.statusText)
         }
 
-        refreshTable();
+        const card = await resp.json();
+
+        deck.appendChild(Row(card))
     } catch (e) {
         return
     }
