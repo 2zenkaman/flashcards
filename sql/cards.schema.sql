@@ -1,0 +1,6 @@
+CREATE TABLE cards (
+    id SERIAL PRIMARY KEY,
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    learned BOOLEAN NOT NULL DEFAULT FALSE
+);
