@@ -39,6 +39,20 @@ const updateButtonsState = () => {
     document.querySelector('#forward').disabled = p === learnDeck.length - 1
 }
 
+const updateLearnState = (reset = false) => {
+    const windowElement = document.querySelector('#flashcards-window')
+    if (learnDeck.length === 0) {
+        windowElement.textContent = 'No cards'
+    } else {
+        if (reset) p = 0
+        windowElement.innerHTML = ''
+        const preview = new Preview(learnDeck[p]).toElement()
+        windowElement.append(preview)
+    }
+
+    updateButtonsState()
+}
+
 window.onload = async () => {
     document.querySelectorAll('form input').forEach(i => i.value = '')
 
@@ -58,14 +72,7 @@ window.onload = async () => {
             deck.appendChild(row)
         })
 
-        if (learnDeck.length === 0) {
-            windowElement.textContent = 'No cards'
-        } else {
-            const preview = new Preview(learnDeck[p]).toElement()
-            windowElement.append(preview)
-        }
-
-        updateButtonsState()
+        updateLearnState()
 
     } catch (e) {
         console.error(e)
@@ -107,11 +114,7 @@ document.querySelector('form').onsubmit = async (ev) => {
         cards.push(new_card)
         learnDeck = selectLearnable(cards)
 
-        if (learnDeck.length === 1) {
-            windowElement.innerHTML = ''
-            const preview = new Preview(learnDeck[p]).toElement()
-            windowElement.append(preview)
-        }
+        updateLearnState()
 
         const row = new_card.toElement(
             handleDelete(new_card.id), 
@@ -122,8 +125,6 @@ document.querySelector('form').onsubmit = async (ev) => {
 
         // clears inputs after card submition
         ev.currentTarget.querySelectorAll('input').forEach(i => i.value = '')
-
-        updateButtonsState()
 
     } catch (e) {
         return console.error(e)
@@ -153,18 +154,10 @@ const handleDelete = (id) => {
                 p = learnDeck.length - 1
             }
 
-            if (learnDeck.length === 0) {
-                windowElement.textContent = 'No cards'
-            } else {
-                windowElement.innerHTML = ''
-                const preview = new Preview(learnDeck[p]).toElement()
-                windowElement.append(preview)
-            }
+            updateLearnState()
 
             // removes row
             getRow(id).remove()
-
-            updateButtonsState()
 
         } catch (e) {
             return console.error(e)
@@ -239,14 +232,7 @@ const handleSwitch = (id) => {
 
 const handleSelectMode = () => {
     learnDeck = selectLearnable(cards)
-    if (learnDeck.length === 0) {
-        windowElement.textContent = 'No cards'
-    } else {
-        windowElement.innerHTML = ''
-        p = 0
-        const preview = new Preview(learnDeck[p]).toElement()
-        windowElement.append(preview)
-    }
+    updateLearnState(true)
 
     document.querySelector('#backward').disabled = p === 0
     document.querySelector('#forward').disabled = p === learnDeck.length - 1
@@ -262,11 +248,7 @@ const movePreview = (func) => {
         if (learnDeck.length <= 1) return;
         p = func(p, learnDeck.length)
 
-        updateButtonsState()
-
-        windowElement.innerHTML = ''
-        const preview = new Preview(learnDeck[p]).toElement()
-        windowElement.append(preview)
+        updateLearnState()
     }
 }
 
