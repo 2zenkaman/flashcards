@@ -68,8 +68,10 @@ const updateLearnState = (reset = false) => {
 }
 
 // document.querySelector('form').addEventListener('submit', (ev) => {...})
-const handleFormSubmit = async (ev) => {
+const handleFormSubmition = async (ev) => {
     ev.preventDefault()
+
+    const form = ev.currentTarget
 
     const req = {
         question: document.querySelector('form input[name="question"]').value.trim(),
@@ -112,43 +114,11 @@ const handleFormSubmit = async (ev) => {
         deck.appendChild(row)
 
         // clears inputs after card submition
-        ev.currentTarget.querySelectorAll('input').forEach(i => i.value = '')
+        form.querySelectorAll('input').forEach(i => i.value = '')
 
     } catch (e) {
         return console.error(e)
     }
-}
-
-window.onload = async () => {
-    document.querySelectorAll('form input').forEach(i => i.value = '')
-
-    try {
-        const resp = await fetch('/api/cards')
-        const data = await resp.json()
-
-        if (!resp.ok) {
-            throw new Error(data.error)
-        }
-
-        data.forEach(c => cards.push(new Card(c)))
-        learnData.deck = selectLearnable(cards)
-
-        cards.forEach(c => {
-            const row = c.toElement(
-                handleDelete(c.id),
-                handleEdit(c.id),
-                handleSwitch(c.id)
-            )
-            deck.appendChild(row)
-        })
-
-        updateLearnState()
-
-    } catch (e) {
-        console.error(e)
-    }
-
-    document.querySelector('form').onsubmit = handleFormSubmit
 }
 
 const handleDelete = (id) => {
@@ -249,16 +219,47 @@ const handleSelectMode = () => {
     updateLearnState(true)
 }
 
-document.querySelector('input[name="not-learned"]').onclick = handleSelectMode
-document.querySelector('input[name="learned"]').onclick = handleSelectMode
+window.onload = async () => {
+    document.querySelectorAll('form input').forEach(i => i.value = '')
 
-document.querySelector('#backward').onclick = () => {
-    learnData.decrement()
-    updateLearnState()
-}
-document.querySelector('#forward').onclick = () => {
-    learnData.increment()
-    updateLearnState()
-}
+    try {
+        const resp = await fetch('/api/cards')
+        const data = await resp.json()
 
-document.querySelector('#flashcards-window').onclick = handleFlipAnimation(() => learnData.deck.length > 0)
+        if (!resp.ok) {
+            throw new Error(data.error)
+        }
+
+        data.forEach(c => cards.push(new Card(c)))
+        learnData.deck = selectLearnable(cards)
+
+        cards.forEach(c => {
+            const row = c.toElement(
+                handleDelete(c.id),
+                handleEdit(c.id),
+                handleSwitch(c.id)
+            )
+            deck.appendChild(row)
+        })
+
+        updateLearnState()
+
+    } catch (e) {
+        console.error(e)
+    }
+
+    document.querySelector('form').onsubmit = handleFormSubmition
+    document.querySelector('input[name="not-learned"]').onclick = handleSelectMode
+    document.querySelector('input[name="learned"]').onclick = handleSelectMode
+
+    document.querySelector('#backward').onclick = () => {
+        learnData.decrement()
+        updateLearnState()
+    }
+    document.querySelector('#forward').onclick = () => {
+        learnData.increment()
+        updateLearnState()
+    }
+
+    document.querySelector('#flashcards-window').onclick = handleFlipAnimation(() => learnData.deck.length > 0)
+}
