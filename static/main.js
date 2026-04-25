@@ -77,27 +77,13 @@ const handleFormSubmition = async (ev) => {
     }
 
     try {
-        const resp = await fetch('/api/cards', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(req),
-        })
-
-        const data = await resp.json()
-
-        if (!resp.ok) {
-            throw new Error(data.error)
-        }
+        const new_card = await postCard(req)
 
         // preserve learned state from edited card
         if (editingCard) {
-            data.learned = editingCard.learned
+            new_card.learned = editingCard.learned
             editingCard = null
         }
-
-        const new_card = new Card(data)
 
         cards.push(new_card)
         learnData.deck = selectLearnable(cards)
@@ -122,16 +108,9 @@ const handleFormSubmition = async (ev) => {
 const handleDelete = (id) => {
     return async () => {
         try {
-            const resp = await fetch(`/api/cards/${id}`, {
-                method: 'DELETE',
-            })
+            await deleteCard(id)
 
-            if (!resp.ok) {
-                const data = await resp.json()
-                throw new Error(data.error)
-            }
-
-            // delete card by id
+            // delete card locally by id
             cards = cards.filter(c => c.id !== id)
             learnData.deck = selectLearnable(cards)
 
@@ -160,39 +139,34 @@ const handleEdit = (id) => {
         editingCard = cards.find(c => c.id === id)
 
         try {
-            const resp = await fetch(`/api/cards/${id}`, {
-                method: 'DELETE',
-            })
+            await deleteCard(id)
 
-            if (!resp.ok) {
-                const data = await resp.json()
-                throw new Error(data.error)
+            // delete card locally by id
+            cards = cards.filter(c => c.id !== id)
+            learnData.deck = selectLearnable(cards)
+
+             // fix index if it's out of bounds
+             if (learnData.p >= learnData.deck.length && learnData.deck.length > 0) {
+                learnData.p = learnData.deck.length - 1
             }
+
+            updateLearnState()
+
+            // removes row
+            getRow(id).remove()
 
         } catch (e) {
             return console.error(e)
         }
-
-        // removes row
-        getRow(id).remove()
-
-        updateButtonsState()
     }
 }
 
 const handleSwitch = (id) => {
     return async () => {
         try {
-            const resp = await fetch(`/api/cards/${id}`, {
-                method: 'PUT',
-            })
+            const data = await switchLearned(id)
 
-            const data = await resp.json();
-
-            if (!resp.ok) {
-                throw new Error(data.error)
-            }
-
+            // switch learned state locally by id
             cards.forEach((c, i, a) => {
                 if (c.id === id) a[i].learned = data.learned
             })
