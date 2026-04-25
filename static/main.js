@@ -82,7 +82,11 @@ window.onload = async () => {
         learnData.deck = selectLearnable(cards)
 
         cards.forEach(c => {
-            const row = c.toElement(handleDelete(c.id), handleEdit(c.id), handleSwitch(c.id))
+            const row = c.toElement(
+                handleDelete(c.id),
+                handleEdit(c.id),
+                handleSwitch(c.id)
+            )
             deck.appendChild(row)
         })
 
