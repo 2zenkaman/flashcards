@@ -3,15 +3,9 @@ export default function Window({question, answer, learned}) {
     window.className = 'window unselectable centered'
     window.dataset.learned = learned
     window.innerHTML = `
-        <div>${question}</div>
-        <div hidden>${answer}</div>
+        <div>Question: ${question}</div>
+        <div hidden>Answer: ${answer}</div>
     `
-
-    window.onclick = () => {
-        window.childNodes.forEach(c => {
-            c.hidden = !c.hidden
-        })
-    }
 
     return window
 }

@@ -15,21 +15,31 @@
     <main>
         <div class="head">
             <form data-learned_temp="null">
-                <div>New card</div>
+                <div class="heading bold">New card</div>
                 <div class="fields">
                     <div class="field">
                         <label for="input-question">Question:</label>
-                        <input type="text" name="question" id="input-question">
+                        <input type="text" name="question" id="input-question" required minlength="1">
                     </div>
                     <div class="field">
                         <label for="input-answer">Answer:</label>
-                        <input type="text" name="answer" id="input-answer">
+                        <input type="text" name="answer" id="input-answer" required minlength="1">
                     </div>
                 </div>
                 <button type="submit">Add</button>
             </form>
             <div class="filters">
-                
+                <div class="heading bold">Learn cards</div>
+                <div class="fields">
+                    <div class="field">
+                        <label for="input-not-learned">Not learned</label>
+                        <input type="checkbox" name="not-learned" id="input-not-learned" checked>
+                    </div>
+                    <div class="field">
+                        <label for="input-learned">Learned</label>
+                        <input type="checkbox" name="learned" id="input-learned">
+                    </div>
+                </div>
             </div>
         </div>
         <table id="flashcards-deck">
@@ -43,11 +53,11 @@
             <tbody></tbody>
         </table>
         <div id="flashcards-learn">
+            <div id="flashcards-window" class="centered unselectable"></div>
             <div id="controls">
                 <button id="backward">Backward</button>
                 <button id="forward">Forward</button>
             </div>
-            <div id="flashcards-window"></div>
         </div>
     </main>
     <script src="static/main.js" type="module"></script>

@@ -35,6 +35,16 @@ main {
     justify-content: space-between;
 }
 
+.head > * {
+    padding: 10px;
+}
+
+.head > * {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
 .filters {
     border: 1px solid var(--primary-color);
     gap: 3em;
@@ -42,10 +52,12 @@ main {
 
 form {
     border: 1px solid var(--primary-color);
-    padding: 10px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+}
+
+.bold {
+    font-weight: bold;
 }
 
 form .fields {
@@ -81,7 +93,7 @@ table#flashcards-deck {
 }
 
 table#flashcards-deck td, table#flashcards-deck th {
-    padding: 5px;
+    padding: 3px;
 }
 
 td.cell-question, td.cell-answer {
@@ -97,4 +109,27 @@ tr.flashcards-row[data-learned="true"] {
 tr.flashcards-row[data-learned="false"] {
     background-color: yellow;
     color: var(--secondary-color);
+}
+
+form input[type="text"]:valid {
+    border: 1px solid green;
+    border-radius: 2px;
+}
+
+form input[type="text"]:invalid {
+    border: 1px solid red;
+    border-radius: 2px;
+}
+
+input[type="text"]:focus {
+    outline: none;
+}
+
+input[type="text"] {
+    padding: 0 3px;
+}
+
+#flashcards-window {
+    padding: 5em 0;
+    border: 1px solid var(--primary-color);
 }

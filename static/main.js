@@ -16,6 +16,13 @@ let cards = []
 let learnDeck = []
 let pointer = 0
 
+const selectLearnable = (cards) => {
+    return cards.filter(c => {
+        if (inputLearned.checked === false && inputNotLearned.checked === false) return false;
+        return c.learned === inputLearned.checked | c.learned === !inputNotLearned.checked
+    })
+}
+
 window.onload = async () => {
     document.querySelector('form').querySelectorAll('input').forEach(i => i.value = '')
 
@@ -28,13 +35,14 @@ window.onload = async () => {
         }
         
         cards = data
+        learnDeck = selectLearnable(cards)
 
         cards.forEach(c => deck.appendChild(Row(c)))
 
-        if (cards.length === 0) {
+        if (learnDeck.length === 0) {
             windowElement.textContent = 'No cards'
         } else {
-            windowElement.append(Window(cards[pointer]))
+            windowElement.append(Window(learnDeck[pointer]))
         }
     } catch (e) {
         console.error(e)
@@ -68,13 +76,15 @@ form.onsubmit = async (ev) => {
         const temp = form.dataset.learned_temp
         if (temp !== 'null') {
             data.learned = temp
+            form.dataset.learned_temp = 'null'
         }
 
         cards.push(data)
+        learnDeck = selectLearnable(cards)
 
-        if (cards.length === 1) {
+        if (learnDeck.length === 1) {
             windowElement.innerHTML = ''
-            windowElement.append(Window(cards[pointer]))
+            windowElement.append(Window(learnDeck[pointer]))
         }
 
         deck.appendChild(Row(data))
@@ -87,17 +97,17 @@ form.onsubmit = async (ev) => {
 }
 
 backward.onclick = () => {
-    if (cards.length <= 1) return;
-    pointer = (((pointer - 1) % cards.length) + cards.length) % cards.length
+    if (learnDeck.length <= 1) return;
+    pointer = (((pointer - 1) % learnDeck.length) + learnDeck.length) % learnDeck.length
     windowElement.innerHTML = ''
-    windowElement.append(Window(cards[pointer]))
+    windowElement.append(Window(learnDeck[pointer]))
 }
 
 forward.onclick = () => {
-    if (cards.length <= 1) return;
-    pointer = (pointer + 1) % cards.length
+    if (learnDeck.length <= 1) return;
+    pointer = (pointer + 1) % learnDeck.length
     windowElement.innerHTML = ''
-    windowElement.append(Window(cards[pointer]))
+    windowElement.append(Window(learnDeck[pointer]))
 }
 
 function Row({id, question, answer, learned}) {
@@ -132,13 +142,15 @@ const handleDelete = (row, id) => {
                 throw new Error(data.error)
             }
 
+            // delete card by id
             cards = cards.filter(c => c.id !== id)
+            learnDeck = selectLearnable(cards)
 
-            if (cards.length === 0) {
+            if (learnDeck.length === 0) {
                 windowElement.textContent = 'No cards'
             } else {
                 windowElement.innerHTML = ''
-                windowElement.append(Window(cards[pointer]))
+                windowElement.append(Window(learnDeck[pointer]))
             }
 
             row.remove()
@@ -187,22 +199,39 @@ const handleSwitch = (row, id) => {
                 throw new Error(data.error)
             }
 
-            row.dataset.learned = data.learned
+            cards.map((c, i, a) => {
+                if (c.id === id) a[i].learned = data.learned
+            })
 
+            row.dataset.learned = data.learned
             ev.target.textContent = data.learned ? 'Learned' : 'Not learned'
+
+            learnDeck = selectLearnable(cards)
+            console.log(cards)
+            console.log(learnDeck)
         } catch (e) {
             console.error(e)
         }
     }
 }
 
-
 // тварь
 const handleSelectMode = () => {
-    learnDeck = cards.filter(c => {
-        return c.learned === inputLearned.checked || c.learned === !inputNotLearned.checked
-    })
+    learnDeck = selectLearnable(cards)
+    if (learnDeck.length === 0) {
+        windowElement.textContent = 'No cards'
+    } else {
+        windowElement.innerHTML = ''
+        pointer = 0
+        windowElement.append(Window(learnDeck[pointer]))
+    }
 }
 
 document.querySelector('input[name="not-learned"]').onclick = handleSelectMode
 document.querySelector('input[name="learned"]').onclick = handleSelectMode
+
+document.querySelector('div#flashcards-window').onclick = (ev) => {
+    ev.target.firstChild.childNodes.forEach(c => {
+        c.hidden = !c.hidden
+    })
+}
