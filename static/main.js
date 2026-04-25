@@ -14,13 +14,17 @@ let learnData = {
     deck: [],
     p: 0,
 
+    current() {
+        return this.deck[this.p]
+    },
+
     decrement() {
         this.p = (((this.p - 1) % this.deck.length) + this.deck.length) % this.deck.length
     },
 
     increment() {
         this.p = (this.p + 1) % this.deck.length
-    }
+    },
 }
 
 let cards = []
@@ -53,12 +57,12 @@ const updateButtonsState = () => {
 
 const updateLearnState = (reset = false) => {
     const windowElement = document.querySelector('#flashcards-window')
-    if (learnDeck.length === 0) {
+    if (learnData.deck.length === 0) {
         windowElement.textContent = 'No cards'
     } else {
-        if (reset) p = 0
+        if (reset) learnData.p = 0
         windowElement.innerHTML = ''
-        const preview = new Preview(learnDeck[p]).toElement()
+        const preview = new Preview(learnData.current()).toElement()
         windowElement.append(preview)
     }
 
@@ -77,7 +81,7 @@ window.onload = async () => {
         }
 
         data.forEach(c => cards.push(new Card(c)))
-        learnDeck = selectLearnable(cards)
+        learnData.deck = selectLearnable(cards)
 
         cards.forEach(c => {
             const row = c.toElement(handleDelete(c.id), handleEdit(c.id), handleSwitch(c.id))
@@ -124,7 +128,7 @@ document.querySelector('form').onsubmit = async (ev) => {
         const new_card = new Card(data)
 
         cards.push(new_card)
-        learnDeck = selectLearnable(cards)
+        learnData.deck = selectLearnable(cards)
 
         updateLearnState()
 
@@ -162,8 +166,8 @@ const handleDelete = (id) => {
             learnDeck = selectLearnable(cards)
 
             // fix index if it's out of bounds
-            if (p >= learnDeck.length && learnDeck.length > 0) {
-                p = learnDeck.length - 1
+            if (learnData.p >= learnData.deck.length && learnData.deck.length > 0) {
+                learnData.p = learnData.deck.length - 1
             }
 
             updateLearnState()
@@ -231,7 +235,7 @@ const handleSwitch = (id) => {
             row.dataset.learned = data.learned
             row.querySelector('.cell-learned').textContent = data.learned ? 'Learned' : 'Not learned'
 
-            learnDeck = selectLearnable(cards)
+            learnData.deck = selectLearnable(cards)
 
             updateButtonsState()
         } catch (e) {
@@ -239,8 +243,6 @@ const handleSwitch = (id) => {
         }
     }
 }
-
-
 
 const handleSelectMode = () => {
     learnDeck = selectLearnable(cards)
@@ -253,26 +255,13 @@ const handleSelectMode = () => {
 document.querySelector('input[name="not-learned"]').onclick = handleSelectMode
 document.querySelector('input[name="learned"]').onclick = handleSelectMode
 
-
-
-const movePreview = (func) => {
-    return () => {
-        if (learnDeck.length <= 1) return;
-        p = func(p, learnDeck.length)
-
-        updateLearnState()
-    }
+document.querySelector('#backward').onclick = () => {
+    learnData.decrement()
+    updateLearnState()
 }
-
-const decrement = (ptr, limit) => {
-    return (((ptr - 1) % limit) + limit) % limit
+document.querySelector('#forward').onclick = () => {
+    learnData.increment()
+    updateLearnState()
 }
-
-const increment = (ptr, limit) => {
-    return (ptr + 1) % limit
-}
-
-document.querySelector('#backward').onclick = movePreview(decrement)
-document.querySelector('#forward').onclick = movePreview(increment)
 
 document.querySelector('#flashcards-window').onclick = handleFlipAnimation(() => learnDeck.length > 0)
