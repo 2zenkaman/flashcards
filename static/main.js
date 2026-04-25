@@ -5,8 +5,6 @@ import Preview from "./preview.js";
 
 import handleFlipAnimation from "./animations.js";
 
-const deck = document.querySelector('#flashcards-deck > tbody')
-
 let learnData = {
     deck: [],
     p: 0,
@@ -111,7 +109,7 @@ const handleFormSubmition = async (ev) => {
             handleEdit(new_card.id), 
             handleSwitch(new_card.id)
         )
-        deck.appendChild(row)
+        document.querySelector('#flashcards-deck > tbody').appendChild(row)
 
         // clears inputs after card submition
         form.querySelectorAll('input').forEach(i => i.value = '')
@@ -239,7 +237,7 @@ window.onload = async () => {
                 handleEdit(c.id),
                 handleSwitch(c.id)
             )
-            deck.appendChild(row)
+            document.querySelector('#flashcards-deck > tbody').appendChild(row)
         })
 
         updateLearnState()
