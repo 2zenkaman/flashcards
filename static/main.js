@@ -11,6 +11,8 @@ const windowElement = document.querySelector('#flashcards-window')
 const inputNotLearned = document.querySelector('input[name="not-learned"]')
 const inputLearned = document.querySelector('input[name="learned"]')
 
+const counter = document.querySelector('div#counter')
+
 let cards = []
 let learnDeck = []
 let p = 0
@@ -221,7 +223,6 @@ const handleSwitch = (id) => {
     }
 }
 
-// тварь
 const handleSelectMode = () => {
     learnDeck = selectLearnable(cards)
     if (learnDeck.length === 0) {
