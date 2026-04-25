@@ -55,15 +55,8 @@ func HandleUpdateCard() gin.HandlerFunc {
 			return
 		}
 
-		var card models.Card
-		if err := ctx.ShouldBindJSON(&card); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid body request: %v", err)})
-			return
-		}
-
-		card.ID = id
-
-		if err := models.UpdateCard(&card); err != nil {
+		card, err := models.UpdateCard(id)
+		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to update card: %v", err)})
 			return
 		}

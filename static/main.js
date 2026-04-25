@@ -1,6 +1,5 @@
 "use strict";
 
-import Row from "./row.js"
 import Window from "./learn.js";
 
 const form = document.querySelector('form')
@@ -23,7 +22,7 @@ window.onload = async () => {
         if (!resp.ok) {
             throw new Error(data.error)
         }
-
+        
         cards = data
 
         cards.forEach(c => deck.appendChild(Row(c)))
@@ -84,12 +83,14 @@ form.onsubmit = async (ev) => {
 }
 
 backward.onclick = () => {
+    if (cards.length <= 1) return;
     pointer = (((pointer - 1) % cards.length) + cards.length) % cards.length
     windowElement.innerHTML = ''
     windowElement.append(Window(cards[pointer]))
 }
 
 forward.onclick = () => {
+    if (cards.length <= 1) return;
     pointer = (pointer + 1) % cards.length
     windowElement.innerHTML = ''
     windowElement.append(Window(cards[pointer]))
@@ -103,14 +104,20 @@ function Row({id, question, answer, learned}) {
         <td class="flashcards-cell cell-id">${id}</td>
         <td class="flashcards-cell cell-question">${question}</td>
         <td class="flashcards-cell cell-answer">${answer}</td>
-        <td class="flashcards-cell cell-learned"></td>
-        <td class="flashcards-cell cell-edit"></td>
-        <td class="flashcards-cell cell-delete"></td>
+        <td class="flashcards-cell cell-learned centered unselectable">${learned ? 'Learned' : 'Not learned'}</td>
+        <td class="flashcards-cell cell-edit centered unselectable">Edit</td>
+        <td class="flashcards-cell cell-delete centered unselectable">Delete</td>
     `
 
-    const deleteButton = document.createElement('button')
-    deleteButton.textContent = 'Delete';
-    deleteButton.onclick = async () => {
+    row.querySelector('td.cell-delete').onclick = handleDelete(row, id)
+    row.querySelector('td.cell-edit').onclick = handleEdit(row, id)
+    row.querySelector('td.cell-learned').onclick = handleSwitch(row, id)
+
+    return row;
+}
+
+const handleDelete = (row, id) => {
+    return async () => {
         try {
             const resp = await fetch(`/api/cards/${id}`, {
                 method: 'DELETE',
@@ -121,19 +128,27 @@ function Row({id, question, answer, learned}) {
                 throw new Error(data.error)
             }
 
+            cards = cards.filter(c => c.id !== id)
+
+            if (cards.length === 0) {
+                windowElement.textContent = 'No cards'
+            } else {
+                windowElement.innerHTML = ''
+                windowElement.append(Window(cards[pointer]))
+            }
+
             row.remove()
 
         } catch (e) {
             return console.error(e)
         }
     }
-    row.querySelector('td.cell-delete').append(deleteButton)
+}
 
-    const editButton = document.createElement('button')
-    editButton.textContent = 'Edit'
-    editButton.onclick = async () => {
-        document.querySelector('form input[name="question"]').value = question
-        document.querySelector('form input[name="answer"]').value = answer
+const handleEdit = (row, id) => {
+    return async (ev) => {
+        document.querySelector('form input[name="question"]').value = ev.currentTarget.parentElement.parentElement.querySelector('td.cell-question').innerHTML
+        document.querySelector('form input[name="answer"]').value = ev.currentTarget.parentElement.parentElement.querySelector('td.cell-answer').innerHTML
 
         document.querySelector('form').dataset.learned_temp = row.dataset.learned
 
@@ -153,19 +168,13 @@ function Row({id, question, answer, learned}) {
 
         row.remove()
     }
-    row.querySelector('td.cell-edit').append(editButton)
+}
 
-    const switchButton = document.createElement('button')
-    switchButton.textContent = learned ? 'Not learned' : 'Learned'
-    switchButton.onclick = async () => {
+const handleSwitch = (row, id) => {
+    return async (ev) => {
         try {
             const resp = await fetch(`/api/cards/${id}`, {
                 method: 'PUT',
-                body: JSON.stringify({
-                    question,
-                    answer,
-                    learned: row.dataset.learned === 'true' ? false : true,
-                })
             })
 
             const data = await resp.json();
@@ -176,12 +185,9 @@ function Row({id, question, answer, learned}) {
 
             row.dataset.learned = data.learned
 
-            switchButton.textContent = data.learned ? 'Not learned' : 'Learned'
+            ev.target.textContent = data.learned ? 'Learned' : 'Not learned'
         } catch (e) {
             console.error(e)
         }
     }
-    row.querySelector('td.cell-learned').append(switchButton)
-
-    return row;
 }

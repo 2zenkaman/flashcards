@@ -44,13 +44,14 @@ func GetAllCards() ([]Card, error) {
 	return cards, nil
 }
 
-func UpdateCard(c *Card) error {
+func UpdateCard(id int) (*Card, error) {
 	if conn == nil {
-		return DatabaseNilError
+		return nil, DatabaseNilError
 	}
 
-	err := conn.QueryRow(context.Background(), "UPDATE cards SET question=$1, answer=$2, learned=$3 WHERE id=$4 RETURNING question, answer, learned", c.Question, c.Answer, c.Learned, c.ID).Scan(&c.Question, &c.Answer, &c.Learned)
-	return err
+	var c Card
+	err := conn.QueryRow(context.Background(), "UPDATE cards SET learned = NOT learned WHERE id=$1 RETURNING *", id).Scan(&c.ID, &c.Question, &c.Answer, &c.Learned)
+	return &c, err
 }
 
 func DeleteCard(id int) error {

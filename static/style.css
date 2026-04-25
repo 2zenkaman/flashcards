@@ -1,7 +1,100 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --primary-color: rgb(232, 232, 232);
+    --secondary-color: rgb(13, 14, 17);
+}
+
+body {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    font-family: 'JetBrains Mono';
+    display: flex;
+    flex-direction: column;
+    gap: 5em;
+}
+
+header {
+    background-color: rgb(13, 13, 16);
+    padding: 10px 20px;
+}
+
+main {
+    width: 50%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3em;
+}
+
+.head {
+    display: flex;
+    justify-content: space-between;
+}
+
+.filters {
+    border: 1px solid var(--primary-color);
+    gap: 3em;
+}
+
+form {
+    border: 1px solid var(--primary-color);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+form .fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.field {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+table#flashcards-deck {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8em;
+    border: 1px solid var(--primary-color);
+}
+
+.centered {
+    text-align: center;
+}
+
+.unselectable {
+    user-select: none;
+}
+
+#flashcards-learn #controls {
+    display: flex;
+    justify-content: space-between;
+}
+
+table#flashcards-deck td, table#flashcards-deck th {
+    padding: 5px;
+}
+
+td.cell-question, td.cell-answer {
+    max-width: 30%;
+    word-break: break-all;
+}
+
 tr.flashcards-row[data-learned="true"] {
     background-color: green;
+    color: var(--primary-color)
 }
 
 tr.flashcards-row[data-learned="false"] {
     background-color: yellow;
+    color: var(--secondary-color);
 }
