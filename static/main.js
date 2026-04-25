@@ -9,7 +9,11 @@ const windowElement = document.querySelector('#flashcards-window')
 const backward = document.querySelector('#backward')
 const forward = document.querySelector('#forward')
 
+const inputNotLearned = document.querySelector('input[name="not-learned"]')
+const inputLearned = document.querySelector('input[name="learned"]')
+
 let cards = []
+let learnDeck = []
 let pointer = 0
 
 window.onload = async () => {
@@ -42,8 +46,8 @@ form.onsubmit = async (ev) => {
     ev.preventDefault()
 
     const req = {
-        question: document.querySelector('form input[name="question"]').value,
-        answer:   document.querySelector('form input[name="answer"]').value,
+        question: document.querySelector('form input[name="question"]').value.trim(),
+        answer:   document.querySelector('form input[name="answer"]').value.trim(),
     }
 
     try {
@@ -101,7 +105,7 @@ function Row({id, question, answer, learned}) {
     row.className = "flashcards-row"
     row.dataset.learned = learned
     row.innerHTML = `
-        <td class="flashcards-cell cell-id">${id}</td>
+        <td class="flashcards-cell cell-id centered">${id}</td>
         <td class="flashcards-cell cell-question">${question}</td>
         <td class="flashcards-cell cell-answer">${answer}</td>
         <td class="flashcards-cell cell-learned centered unselectable">${learned ? 'Learned' : 'Not learned'}</td>
@@ -191,3 +195,14 @@ const handleSwitch = (row, id) => {
         }
     }
 }
+
+
+// тварь
+const handleSelectMode = () => {
+    learnDeck = cards.filter(c => {
+        return c.learned === inputLearned.checked || c.learned === !inputNotLearned.checked
+    })
+}
+
+document.querySelector('input[name="not-learned"]').onclick = handleSelectMode
+document.querySelector('input[name="learned"]').onclick = handleSelectMode
