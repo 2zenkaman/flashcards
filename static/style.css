@@ -88,10 +88,20 @@ table#flashcards-deck {
     user-select: none;
 }
 
+#flashcards-learn {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
 #flashcards-learn #controls {
     display: flex;
     justify-content: space-between;
 }
+
+#flashcards-learn #controls button {
+    width: 100px;
+}   
 
 table#flashcards-deck td, table#flashcards-deck th {
     padding: 3px;

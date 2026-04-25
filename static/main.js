@@ -1,7 +1,7 @@
 "use strict";
 
 import Card from "./card.js";
-import Preview from "./learn.js";
+import Preview from "./preview.js";
 
 const form = document.querySelector('form')
 const deck = document.querySelector('#flashcards-deck > tbody')
@@ -9,8 +9,6 @@ const windowElement = document.querySelector('#flashcards-window')
 
 const inputNotLearned = document.querySelector('input[name="not-learned"]')
 const inputLearned = document.querySelector('input[name="learned"]')
-
-const counter = document.querySelector('div#counter')
 
 let cards = []
 let learnDeck = []
@@ -33,14 +31,6 @@ const selectLearnable = (cards) => {
         if (inputLearned.checked === false && inputNotLearned.checked === false) return false;
         return c.learned === inputLearned.checked || c.learned !== inputNotLearned.checked
     })
-}
-
-const decrement = (ptr, limit) => {
-    return (((ptr - 1) % limit) + limit) % limit
-}
-
-const increment = (ptr, limit) => {
-    return (ptr + 1) % limit
 }
 
 window.onload = async () => {
@@ -129,18 +119,7 @@ form.onsubmit = async (ev) => {
     }
 }
 
-const movePreview = (func) => {
-    return (ev) => {
-        if (learnDeck.length <= 1) return;
-        p = func(p, learnDeck.length)
-        windowElement.innerHTML = ''
-        const preview = new Preview(learnDeck[p]).toElement()
-        windowElement.append(preview)
-    }
-}
 
-document.querySelector('#backward').onclick = movePreview(decrement)
-document.querySelector('#forward').onclick = movePreview(increment)
 
 const handleDelete = (id) => {
     return async () => {
@@ -239,6 +218,8 @@ const handleSwitch = (id) => {
     }
 }
 
+
+
 const handleSelectMode = () => {
     learnDeck = selectLearnable(cards)
     if (learnDeck.length === 0) {
@@ -254,6 +235,32 @@ const handleSelectMode = () => {
 document.querySelector('input[name="not-learned"]').onclick = handleSelectMode
 document.querySelector('input[name="learned"]').onclick = handleSelectMode
 
+
+
+const movePreview = (func) => {
+    return () => {
+        if (learnDeck.length <= 1) return;
+        p = func(p, learnDeck.length)
+        windowElement.innerHTML = ''
+        const preview = new Preview(learnDeck[p]).toElement()
+        windowElement.append(preview)
+    }
+}
+
+const decrement = (ptr, limit) => {
+    return (((ptr - 1) % limit) + limit) % limit
+}
+
+const increment = (ptr, limit) => {
+    return (ptr + 1) % limit
+}
+
+document.querySelector('#backward').onclick = movePreview(decrement)
+document.querySelector('#forward').onclick = movePreview(increment)
+
+
+
+// animation
 document.querySelector('div#flashcards-window').onclick = (ev) => {
     if (learnDeck.length === 0) return
 
