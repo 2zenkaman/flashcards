@@ -51,8 +51,8 @@ const selectLearnable = (cards) => {
 }
 
 const updateButtonsState = () => {
-    document.querySelector('#backward').disabled = p === 0
-    document.querySelector('#forward').disabled = p === learnDeck.length - 1
+    document.querySelector('#backward').disabled = learnData.p === 0
+    document.querySelector('#forward').disabled = learnData.p === learnData.deck.length - 1
 }
 
 const updateLearnState = (reset = false) => {
@@ -163,7 +163,7 @@ const handleDelete = (id) => {
 
             // delete card by id
             cards = cards.filter(c => c.id !== id)
-            learnDeck = selectLearnable(cards)
+            learnData.deck = selectLearnable(cards)
 
             // fix index if it's out of bounds
             if (learnData.p >= learnData.deck.length && learnData.deck.length > 0) {
@@ -245,11 +245,8 @@ const handleSwitch = (id) => {
 }
 
 const handleSelectMode = () => {
-    learnDeck = selectLearnable(cards)
+    learnData.deck = selectLearnable(cards)
     updateLearnState(true)
-
-    document.querySelector('#backward').disabled = p === 0
-    document.querySelector('#forward').disabled = p === learnDeck.length - 1
 }
 
 document.querySelector('input[name="not-learned"]').onclick = handleSelectMode
