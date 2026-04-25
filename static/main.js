@@ -2,6 +2,7 @@
 
 import Window from "./learn.js";
 import Card from "./card.js";
+import Prewiew from "./learn.js";
 
 const form = document.querySelector('form')
 const deck = document.querySelector('#flashcards-deck > tbody')
@@ -54,7 +55,8 @@ window.onload = async () => {
         if (learnDeck.length === 0) {
             windowElement.textContent = 'No cards'
         } else {
-            windowElement.append(Window(learnDeck[p]))
+            const prewiew = new Prewiew(learnDeck[p]).toElement()
+            windowElement.append(prewiew)
         }
     } catch (e) {
         console.error(e)
@@ -99,7 +101,8 @@ form.onsubmit = async (ev) => {
 
         if (learnDeck.length === 1) {
             windowElement.innerHTML = ''
-            windowElement.append(Window(learnDeck[p]))
+            const prewiew = new Prewiew(learnDeck[p]).toElement()
+            windowElement.append(prewiew)
         }
 
         const row = new_card.toElement(handleDelete(new_card.id), handleEdit(new_card.id), handleSwitch(new_card.id))
@@ -107,8 +110,7 @@ form.onsubmit = async (ev) => {
 
         form.querySelectorAll('input').forEach(i => i.value = '')
     } catch (e) {
-        console.error(e)
-        return
+        return console.error(e)
     }
 }
 
@@ -116,14 +118,16 @@ document.querySelector('#backward').onclick = () => {
     if (learnDeck.length <= 1) return;
     p = (((p - 1) % learnDeck.length) + learnDeck.length) % learnDeck.length
     windowElement.innerHTML = ''
-    windowElement.append(Window(learnDeck[p]))
+    const prewiew = new Prewiew(learnDeck[p]).toElement()
+    windowElement.append(prewiew)
 }
 
 document.querySelector('#forward').onclick = () => {
     if (learnDeck.length <= 1) return;
     p = (p + 1) % learnDeck.length
     windowElement.innerHTML = ''
-    windowElement.append(Window(learnDeck[p]))
+    const prewiew = new Prewiew(learnDeck[p]).toElement()
+    windowElement.append(prewiew)
 }
 
 const handleDelete = (id) => {
@@ -146,7 +150,8 @@ const handleDelete = (id) => {
                 windowElement.textContent = 'No cards'
             } else {
                 windowElement.innerHTML = ''
-                windowElement.append(Window(learnDeck[p]))
+                const prewiew = new Prewiew(learnDeck[p]).toElement()
+                windowElement.append(prewiew)
             }
 
             // removes row
@@ -224,7 +229,8 @@ const handleSelectMode = () => {
     } else {
         windowElement.innerHTML = ''
         p = 0
-        windowElement.append(Window(learnDeck[p]))
+        const prewiew = new Prewiew(learnDeck[p]).toElement()
+        windowElement.append(prewiew)
     }
 }
 
@@ -232,6 +238,8 @@ document.querySelector('input[name="not-learned"]').onclick = handleSelectMode
 document.querySelector('input[name="learned"]').onclick = handleSelectMode
 
 document.querySelector('div#flashcards-window').onclick = (ev) => {
+    if (learnDeck.length === 0) return
+
     const window = ev.currentTarget.querySelector('div.window')
     window.classList.toggle('active')
 

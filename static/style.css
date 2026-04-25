@@ -6,6 +6,7 @@
 :root {
     --primary-color: rgb(232, 232, 232);
     --secondary-color: rgb(13, 14, 17);
+    --primary-color-darker: rgb(197, 197, 197);
 }
 
 body {
@@ -140,4 +141,16 @@ input[type="text"] {
 
 .active {
     transform: rotateY(180deg);
+}
+
+button {
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 2px;
+    height: 20px;
+    padding: 0 5px;
+}
+
+button:active {
+    background-color: var(--primary-color-darker);
 }

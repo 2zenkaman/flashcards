@@ -1,11 +1,23 @@
-export default function Window({question, answer, learned}) {
-    const window = document.createElement('div')
-    window.className = 'window unselectable centered'
-    window.dataset.learned = learned
-    window.innerHTML = `
-        <div>Question: ${question}</div>
-        <div hidden>Answer: ${answer}</div>
-    `
+export default class Prewiew {
+    question
+    answer
+    learned
 
-    return window
+    constructor({question, answer, learned}) {
+        this.question = question
+        this.answer = answer
+        this.learned = learned
+    }
+
+    toElement() {
+        const prewiew = document.createElement('div')
+        prewiew.className = 'window unselectable centered'
+        prewiew.dataset.learned = this.learned
+        prewiew.innerHTML = `
+            <div>Question: ${this.question}</div>
+            <div hidden>Answer: ${this.answer}</div>
+        `
+
+        return prewiew
+    }
 }
