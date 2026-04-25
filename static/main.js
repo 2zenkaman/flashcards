@@ -7,9 +7,6 @@ import handleFlipAnimation from "./animations.js";
 
 const deck = document.querySelector('#flashcards-deck > tbody')
 
-const inputNotLearned = document.querySelector('input[name="not-learned"]')
-const inputLearned = document.querySelector('input[name="learned"]')
-
 let learnData = {
     deck: [],
     p: 0,
@@ -42,6 +39,9 @@ const getRow = (id) => {
 }
 
 const selectLearnable = (cards) => {
+    const inputNotLearned = document.querySelector('input[name="not-learned"]')
+    const inputLearned = document.querySelector('input[name="learned"]')
+    
     return cards.filter(c => {
         if (inputLearned.checked === false && inputNotLearned.checked === false) return false;
         return c.learned === inputLearned.checked || c.learned !== inputNotLearned.checked
