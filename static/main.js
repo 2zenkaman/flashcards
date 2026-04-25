@@ -4,6 +4,7 @@ import Card from "./card.js";
 import Preview from "./preview.js";
 
 import handleFlipAnimation from "./animations.js";
+import {postCard, deleteCard, switchLearned} from "./api.js"
 
 let learnData = {
     deck: [],
@@ -132,8 +133,9 @@ const handleDelete = (id) => {
 
 const handleEdit = (id) => {
     return async (ev) => {
-        document.querySelector('form input[name="question"]').value = ev.currentTarget.parentElement.parentElement.querySelector('td.cell-question').textContent.trim()
-        document.querySelector('form input[name="answer"]').value = ev.currentTarget.parentElement.parentElement.querySelector('td.cell-answer').textContent.trim()
+        const editButton = ev.currentTarget
+        document.querySelector('form input[name="question"]').value = editButton.closest('tr').querySelector('td.cell-question').textContent.trim()
+        document.querySelector('form input[name="answer"]').value = editButton.closest('tr').querySelector('td.cell-answer').textContent.trim()
 
         // save the editing card to preserve its learned state
         editingCard = cards.find(c => c.id === id)

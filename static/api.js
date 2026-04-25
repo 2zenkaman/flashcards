@@ -1,3 +1,5 @@
+import Card from "./card.js";
+
 export async function postCard({question, answer}) {
     const resp = await fetch('/api/cards', {
         method: 'POST',
