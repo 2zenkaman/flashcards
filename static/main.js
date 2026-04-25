@@ -251,6 +251,7 @@ window.onload = async () => {
     document.querySelector('form').onsubmit = handleFormSubmition
     document.querySelector('input[name="not-learned"]').onclick = handleSelectMode
     document.querySelector('input[name="learned"]').onclick = handleSelectMode
+    document.querySelector('#flashcards-window').onclick = handleFlipAnimation(() => learnData.deck.length > 0)
 
     document.querySelector('#backward').onclick = () => {
         learnData.decrement()
@@ -260,6 +261,4 @@ window.onload = async () => {
         learnData.increment()
         updateLearnState()
     }
-
-    document.querySelector('#flashcards-window').onclick = handleFlipAnimation(() => learnData.deck.length > 0)
 }
