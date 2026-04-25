@@ -68,6 +68,7 @@ const updateLearnState = (reset = false) => {
 const handleFormSubmition = async (ev) => {
     ev.preventDefault()
 
+    // preserve the fucking form cause it is somehow lost after submit and I have no idea why, so I have to query it again, thanks HTML
     const form = ev.currentTarget
 
     const req = {
