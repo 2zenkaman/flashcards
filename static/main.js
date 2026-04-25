@@ -3,7 +3,8 @@
 import Card from "./card.js";
 import Preview from "./preview.js";
 
-const form = document.querySelector('form')
+import handleFlipAnimation from "./animations.js";
+
 const deck = document.querySelector('#flashcards-deck > tbody')
 const windowElement = document.querySelector('#flashcards-window')
 
@@ -72,7 +73,7 @@ window.onload = async () => {
 }
 
 // document.querySelector('form').addEventListener('submit', (ev) => {...})
-form.onsubmit = async (ev) => {
+document.querySelector('form').onsubmit = async (ev) => {
     ev.preventDefault()
 
     const req = {
@@ -120,7 +121,7 @@ form.onsubmit = async (ev) => {
         deck.appendChild(row)
 
         // clears inputs after card submition
-        form.querySelectorAll('input').forEach(i => i.value = '')
+        ev.currentTarget.querySelectorAll('input').forEach(i => i.value = '')
 
         updateButtonsState()
 
@@ -280,19 +281,4 @@ const increment = (ptr, limit) => {
 document.querySelector('#backward').onclick = movePreview(decrement)
 document.querySelector('#forward').onclick = movePreview(increment)
 
-
-
-// animation
-document.querySelector('div#flashcards-window').onclick = (ev) => {
-    if (learnDeck.length === 0) return
-
-    const window = ev.currentTarget.querySelector('div.window')
-    window.classList.toggle('active')
-
-    setTimeout(() => {
-        window.classList.toggle('active')
-        window.childNodes.forEach(c => {
-            c.hidden = !c.hidden
-        })
-    }, 150);
-}
+document.querySelector('#flashcards-window').onclick = handleFlipAnimation(learnDeck.length > 0)
