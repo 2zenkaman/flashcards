@@ -264,4 +264,4 @@ document.querySelector('#forward').onclick = () => {
     updateLearnState()
 }
 
-document.querySelector('#flashcards-window').onclick = handleFlipAnimation(() => learnDeck.length > 0)
+document.querySelector('#flashcards-window').onclick = handleFlipAnimation(() => learnData.deck.length > 0)
