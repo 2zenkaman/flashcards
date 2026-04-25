@@ -33,6 +33,11 @@ const selectLearnable = (cards) => {
     })
 }
 
+const updateButtonsState = () => {
+    document.querySelector('#backward').disabled = p === 0
+    document.querySelector('#forward').disabled = p === learnDeck.length - 1
+}
+
 window.onload = async () => {
     document.querySelectorAll('form input').forEach(i => i.value = '')
 
@@ -59,8 +64,7 @@ window.onload = async () => {
             windowElement.append(preview)
         }
 
-        document.querySelector('#backward').disabled = p === 0
-        document.querySelector('#forward').disabled = p === learnDeck.length - 1
+        updateButtonsState()
 
     } catch (e) {
         console.error(e)
@@ -118,8 +122,7 @@ form.onsubmit = async (ev) => {
         // clears inputs after card submition
         form.querySelectorAll('input').forEach(i => i.value = '')
 
-        document.querySelector('#backward').disabled = p === 0
-        document.querySelector('#forward').disabled = p === learnDeck.length - 1
+        updateButtonsState()
 
     } catch (e) {
         return console.error(e)
@@ -160,8 +163,7 @@ const handleDelete = (id) => {
             // removes row
             getRow(id).remove()
 
-            document.querySelector('#backward').disabled = p === 0
-            document.querySelector('#forward').disabled = p === learnDeck.length - 1
+            updateButtonsState()
 
         } catch (e) {
             return console.error(e)
@@ -196,8 +198,7 @@ const handleEdit = (id) => {
         // removes row
         getRow(id).remove()
 
-        document.querySelector('#backward').disabled = p === 0
-        document.querySelector('#forward').disabled = p === learnDeck.length - 1
+        updateButtonsState()
     }
 }
 
@@ -226,8 +227,7 @@ const handleSwitch = (id) => {
 
             learnDeck = selectLearnable(cards)
 
-            document.querySelector('#backward').disabled = p === 0
-            document.querySelector('#forward').disabled = p === learnDeck.length - 1
+            updateButtonsState()
         } catch (e) {
             console.error(e)
         }
@@ -261,8 +261,7 @@ const movePreview = (func) => {
         if (learnDeck.length <= 1) return;
         p = func(p, learnDeck.length)
 
-        document.querySelector('#backward').disabled = p === 0
-        document.querySelector('#forward').disabled = p === learnDeck.length - 1
+        updateButtonsState()
 
         windowElement.innerHTML = ''
         const preview = new Preview(learnDeck[p]).toElement()
