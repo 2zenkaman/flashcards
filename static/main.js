@@ -4,7 +4,7 @@ import Card from "./card.js";
 import Preview from "./preview.js";
 
 import handleFlipAnimation from "./animations.js";
-import {postCard, deleteCard, switchLearned} from "./api.js"
+import {postCard, deleteCard, switchLearned, getCards} from "./api.js"
 
 let learnData = {
     deck: [],
@@ -197,14 +197,7 @@ window.onload = async () => {
     document.querySelectorAll('form input').forEach(i => i.value = '')
 
     try {
-        const resp = await fetch('/api/cards')
-        const data = await resp.json()
-
-        if (!resp.ok) {
-            throw new Error(data.error)
-        }
-
-        data.forEach(c => cards.push(new Card(c)))
+        cards = await getCards()
         learnData.deck = selectLearnable(cards)
 
         cards.forEach(c => {
