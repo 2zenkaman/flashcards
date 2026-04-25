@@ -1,6 +1,6 @@
 export default function handleFlipAnimation(when) {
     return (ev) => {
-        if (!when) return
+        if (!when()) return
 
         const window = ev.currentTarget.querySelector('div.window')
         window.classList.toggle('active')

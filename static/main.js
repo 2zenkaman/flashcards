@@ -262,4 +262,4 @@ const increment = (ptr, limit) => {
 document.querySelector('#backward').onclick = movePreview(decrement)
 document.querySelector('#forward').onclick = movePreview(increment)
 
-document.querySelector('#flashcards-window').onclick = handleFlipAnimation(learnDeck.length > 0)
+document.querySelector('#flashcards-window').onclick = handleFlipAnimation(() => learnDeck.length > 0)
