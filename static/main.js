@@ -6,7 +6,6 @@ import Preview from "./preview.js";
 import handleFlipAnimation from "./animations.js";
 
 const deck = document.querySelector('#flashcards-deck > tbody')
-const windowElement = document.querySelector('#flashcards-window')
 
 const inputNotLearned = document.querySelector('input[name="not-learned"]')
 const inputLearned = document.querySelector('input[name="learned"]')
