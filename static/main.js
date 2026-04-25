@@ -231,7 +231,13 @@ document.querySelector('input[name="not-learned"]').onclick = handleSelectMode
 document.querySelector('input[name="learned"]').onclick = handleSelectMode
 
 document.querySelector('div#flashcards-window').onclick = (ev) => {
-    ev.target.firstChild.childNodes.forEach(c => {
-        c.hidden = !c.hidden
-    })
+    const window = ev.target.querySelector('div.window')
+    window.classList.toggle('active')
+
+    setTimeout(() => {
+        window.classList.toggle('active')
+        ev.target.firstChild.childNodes.forEach(c => {
+            c.hidden = !c.hidden
+        })
+    }, 150);
 }

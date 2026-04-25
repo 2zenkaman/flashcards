@@ -133,3 +133,11 @@ input[type="text"] {
     padding: 5em 0;
     border: 1px solid var(--primary-color);
 }
+
+#flashcards-window > .window {
+    transition: all 0.3s linear;
+}
+
+.active {
+    transform: rotateY(180deg);
+}
