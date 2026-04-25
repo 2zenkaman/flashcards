@@ -188,8 +188,6 @@ const handleEdit = (id) => {
         document.querySelector('form input[name="question"]').value = ev.currentTarget.parentElement.parentElement.querySelector('td.cell-question').textContent.trim()
         document.querySelector('form input[name="answer"]').value = ev.currentTarget.parentElement.parentElement.querySelector('td.cell-answer').textContent.trim()
 
-        const row = getRow(id)
-
         // save the editing card to preserve its learned state
         editingCard = cards.find(c => c.id === id)
 
