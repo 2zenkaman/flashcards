@@ -18,6 +18,18 @@ export async function postCard({question, answer}) {
     return new Card(data)
 }
 
+export async function getCards() {
+    const resp = await fetch('/api/cards')
+
+    const data = await resp.json()
+
+    if (!resp.ok) {
+        throw new Error(data.error)
+    }
+
+    return data.map(c => new Card(c))
+}
+
 export async function deleteCard(id) {
     const resp = await fetch(`/api/cards/${id}`, {
         method: 'DELETE',
