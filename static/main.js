@@ -65,7 +65,6 @@ const updateLearnState = (reset = false) => {
     updateButtonsState()
 }
 
-// document.querySelector('form').addEventListener('submit', (ev) => {...})
 const handleFormSubmition = async (ev) => {
     ev.preventDefault()
 
