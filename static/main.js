@@ -97,8 +97,7 @@ window.onload = async () => {
     }
 }
 
-// document.querySelector('form').addEventListener('submit', (ev) => {...})
-document.querySelector('form').onsubmit = async (ev) => {
+document.querySelector('form').addEventListener('submit', async (ev) => {
     ev.preventDefault()
 
     const req = {
@@ -147,8 +146,7 @@ document.querySelector('form').onsubmit = async (ev) => {
     } catch (e) {
         return console.error(e)
     }
-}
-
+})
 
 
 const handleDelete = (id) => {
