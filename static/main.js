@@ -1,6 +1,5 @@
 "use strict";
 
-import Card from "./card.js";
 import Preview from "./preview.js";
 
 import handleFlipAnimation from "./animations.js";
