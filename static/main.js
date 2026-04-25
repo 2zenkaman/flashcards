@@ -35,6 +35,14 @@ const selectLearnable = (cards) => {
     })
 }
 
+const decrement = (ptr, limit) => {
+    return (((ptr - 1) % limit) + limit) % limit
+}
+
+const increment = (ptr, limit) => {
+    return (ptr + 1) % limit
+}
+
 window.onload = async () => {
     document.querySelectorAll('form input').forEach(i => i.value = '')
 
@@ -45,7 +53,7 @@ window.onload = async () => {
         if (!resp.ok) {
             throw new Error(data.error)
         }
-        
+
         data.forEach(c => cards.push(new Card(c)))
         learnDeck = selectLearnable(cards)
 
@@ -107,10 +115,16 @@ form.onsubmit = async (ev) => {
             windowElement.append(prewiew)
         }
 
-        const row = new_card.toElement(handleDelete(new_card.id), handleEdit(new_card.id), handleSwitch(new_card.id))
+        const row = new_card.toElement(
+            handleDelete(new_card.id), 
+            handleEdit(new_card.id), 
+            handleSwitch(new_card.id)
+        )
         deck.appendChild(row)
 
+        // clears inputs after card submition
         form.querySelectorAll('input').forEach(i => i.value = '')
+
     } catch (e) {
         return console.error(e)
     }
@@ -118,7 +132,7 @@ form.onsubmit = async (ev) => {
 
 document.querySelector('#backward').onclick = () => {
     if (learnDeck.length <= 1) return;
-    p = (((p - 1) % learnDeck.length) + learnDeck.length) % learnDeck.length
+    decrement(p, learnDeck.length)
     windowElement.innerHTML = ''
     const prewiew = new Prewiew(learnDeck[p]).toElement()
     windowElement.append(prewiew)
@@ -126,7 +140,7 @@ document.querySelector('#backward').onclick = () => {
 
 document.querySelector('#forward').onclick = () => {
     if (learnDeck.length <= 1) return;
-    p = (p + 1) % learnDeck.length
+    increment(ptr, learnDeck.length)
     windowElement.innerHTML = ''
     const prewiew = new Prewiew(learnDeck[p]).toElement()
     windowElement.append(prewiew)
