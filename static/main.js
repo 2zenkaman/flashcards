@@ -28,8 +28,6 @@ let learnData = {
 }
 
 let cards = []
-let learnDeck = []
-let p = 0
 let editingCard = null
 
 const getRow = (id) => {
