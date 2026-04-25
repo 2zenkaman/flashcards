@@ -34,25 +34,22 @@ main {
 .head {
     display: flex;
     justify-content: space-between;
+    gap: 1em;
 }
 
 .head > * {
     padding: 10px;
-}
-
-.head > * {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    border: 1px solid var(--primary-color);
 }
 
 .filters {
-    border: 1px solid var(--primary-color);
     gap: 3em;
 }
 
 form {
-    border: 1px solid var(--primary-color);
     display: flex;
     flex-direction: column;
 }
@@ -163,4 +160,14 @@ button {
 
 button:active {
     background-color: var(--primary-color-darker);
+}
+
+button:disabled {
+    background-color: rgb(100, 100, 100);
+    color: rgb(150, 150, 150);
+    cursor: not-allowed;
+}
+
+button:disabled:active {
+    background-color: rgb(100, 100, 100);
 }

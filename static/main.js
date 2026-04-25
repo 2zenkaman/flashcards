@@ -58,6 +58,10 @@ window.onload = async () => {
             const preview = new Preview(learnDeck[p]).toElement()
             windowElement.append(preview)
         }
+
+        document.querySelector('#backward').disabled = p === 0
+        document.querySelector('#forward').disabled = p === learnDeck.length - 1
+
     } catch (e) {
         console.error(e)
     }
@@ -114,6 +118,9 @@ form.onsubmit = async (ev) => {
         // clears inputs after card submition
         form.querySelectorAll('input').forEach(i => i.value = '')
 
+        document.querySelector('#backward').disabled = p === 0
+        document.querySelector('#forward').disabled = p === learnDeck.length - 1
+
     } catch (e) {
         return console.error(e)
     }
@@ -153,6 +160,9 @@ const handleDelete = (id) => {
             // removes row
             getRow(id).remove()
 
+            document.querySelector('#backward').disabled = p === 0
+            document.querySelector('#forward').disabled = p === learnDeck.length - 1
+
         } catch (e) {
             return console.error(e)
         }
@@ -185,6 +195,9 @@ const handleEdit = (id) => {
 
         // removes row
         getRow(id).remove()
+
+        document.querySelector('#backward').disabled = p === 0
+        document.querySelector('#forward').disabled = p === learnDeck.length - 1
     }
 }
 
@@ -212,6 +225,9 @@ const handleSwitch = (id) => {
             row.querySelector('.cell-learned').textContent = data.learned ? 'Learned' : 'Not learned'
 
             learnDeck = selectLearnable(cards)
+
+            document.querySelector('#backward').disabled = p === 0
+            document.querySelector('#forward').disabled = p === learnDeck.length - 1
         } catch (e) {
             console.error(e)
         }
@@ -230,6 +246,9 @@ const handleSelectMode = () => {
         const preview = new Preview(learnDeck[p]).toElement()
         windowElement.append(preview)
     }
+
+    document.querySelector('#backward').disabled = p === 0
+    document.querySelector('#forward').disabled = p === learnDeck.length - 1
 }
 
 document.querySelector('input[name="not-learned"]').onclick = handleSelectMode
@@ -241,6 +260,10 @@ const movePreview = (func) => {
     return () => {
         if (learnDeck.length <= 1) return;
         p = func(p, learnDeck.length)
+
+        document.querySelector('#backward').disabled = p === 0
+        document.querySelector('#forward').disabled = p === learnDeck.length - 1
+
         windowElement.innerHTML = ''
         const preview = new Preview(learnDeck[p]).toElement()
         windowElement.append(preview)
