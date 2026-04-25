@@ -67,37 +67,8 @@ const updateLearnState = (reset = false) => {
     updateButtonsState()
 }
 
-window.onload = async () => {
-    document.querySelectorAll('form input').forEach(i => i.value = '')
-
-    try {
-        const resp = await fetch('/api/cards')
-        const data = await resp.json()
-
-        if (!resp.ok) {
-            throw new Error(data.error)
-        }
-
-        data.forEach(c => cards.push(new Card(c)))
-        learnData.deck = selectLearnable(cards)
-
-        cards.forEach(c => {
-            const row = c.toElement(
-                handleDelete(c.id),
-                handleEdit(c.id),
-                handleSwitch(c.id)
-            )
-            deck.appendChild(row)
-        })
-
-        updateLearnState()
-
-    } catch (e) {
-        console.error(e)
-    }
-}
-
-document.querySelector('form').addEventListener('submit', async (ev) => {
+// document.querySelector('form').addEventListener('submit', (ev) => {...})
+const handleFormSubmit = async (ev) => {
     ev.preventDefault()
 
     const req = {
@@ -146,8 +117,39 @@ document.querySelector('form').addEventListener('submit', async (ev) => {
     } catch (e) {
         return console.error(e)
     }
-})
+}
 
+window.onload = async () => {
+    document.querySelectorAll('form input').forEach(i => i.value = '')
+
+    try {
+        const resp = await fetch('/api/cards')
+        const data = await resp.json()
+
+        if (!resp.ok) {
+            throw new Error(data.error)
+        }
+
+        data.forEach(c => cards.push(new Card(c)))
+        learnData.deck = selectLearnable(cards)
+
+        cards.forEach(c => {
+            const row = c.toElement(
+                handleDelete(c.id),
+                handleEdit(c.id),
+                handleSwitch(c.id)
+            )
+            deck.appendChild(row)
+        })
+
+        updateLearnState()
+
+    } catch (e) {
+        console.error(e)
+    }
+
+    document.querySelector('form').onsubmit = handleFormSubmit
+}
 
 const handleDelete = (id) => {
     return async () => {
