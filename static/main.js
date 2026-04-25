@@ -10,6 +10,19 @@ const deck = document.querySelector('#flashcards-deck > tbody')
 const inputNotLearned = document.querySelector('input[name="not-learned"]')
 const inputLearned = document.querySelector('input[name="learned"]')
 
+let learnData = {
+    deck: [],
+    p: 0,
+
+    decrement() {
+        this.p = (((this.p - 1) % this.deck.length) + this.deck.length) % this.deck.length
+    },
+
+    increment() {
+        this.p = (this.p + 1) % this.deck.length
+    }
+}
+
 let cards = []
 let learnDeck = []
 let p = 0
