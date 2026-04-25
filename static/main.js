@@ -1,20 +1,29 @@
 "use strict";
 
 import Window from "./learn.js";
+import Card from "./card.js";
 
 const form = document.querySelector('form')
 const deck = document.querySelector('#flashcards-deck > tbody')
 const windowElement = document.querySelector('#flashcards-window')
-
-const backward = document.querySelector('#backward')
-const forward = document.querySelector('#forward')
 
 const inputNotLearned = document.querySelector('input[name="not-learned"]')
 const inputLearned = document.querySelector('input[name="learned"]')
 
 let cards = []
 let learnDeck = []
-let pointer = 0
+let p = 0
+
+const getRow = (id) => {
+    let row
+    document.querySelectorAll('tr.flashcards-row').forEach(s => {
+        if (s.querySelector('.cell-id').innerHTML == id) {
+            row = s
+        }
+    })
+
+    return row
+}
 
 const selectLearnable = (cards) => {
     return cards.filter(c => {
@@ -24,7 +33,7 @@ const selectLearnable = (cards) => {
 }
 
 window.onload = async () => {
-    document.querySelector('form').querySelectorAll('input').forEach(i => i.value = '')
+    document.querySelectorAll('form input').forEach(i => i.value = '')
 
     try {
         const resp = await fetch('/api/cards')
@@ -34,15 +43,18 @@ window.onload = async () => {
             throw new Error(data.error)
         }
         
-        cards = data
+        data.forEach(c => cards.push(new Card(c)))
         learnDeck = selectLearnable(cards)
 
-        cards.forEach(c => deck.appendChild(Row(c)))
+        cards.forEach(c => {
+            const row = c.toElement(handleDelete(c.id), handleEdit(c.id), handleSwitch(c.id))
+            deck.appendChild(row)
+        })
 
         if (learnDeck.length === 0) {
             windowElement.textContent = 'No cards'
         } else {
-            windowElement.append(Window(learnDeck[pointer]))
+            windowElement.append(Window(learnDeck[p]))
         }
     } catch (e) {
         console.error(e)
@@ -73,21 +85,25 @@ form.onsubmit = async (ev) => {
             throw new Error(data.error)
         }
 
-        const temp = form.dataset.learned_temp
-        if (temp !== 'null') {
-            data.learned = temp
+        // temporary variable to track the edited card's state
+        const learned_temp = form.dataset.learned_temp
+        if (learned_temp !== 'null') {
+            data.learned = learned_temp
             form.dataset.learned_temp = 'null'
         }
 
-        cards.push(data)
+        const new_card = new Card(data)
+
+        cards.push(new_card)
         learnDeck = selectLearnable(cards)
 
         if (learnDeck.length === 1) {
             windowElement.innerHTML = ''
-            windowElement.append(Window(learnDeck[pointer]))
+            windowElement.append(Window(learnDeck[p]))
         }
 
-        deck.appendChild(Row(data))
+        const row = new_card.toElement(handleDelete(new_card.id), handleEdit(new_card.id), handleSwitch(new_card.id))
+        deck.appendChild(row)
 
         form.querySelectorAll('input').forEach(i => i.value = '')
     } catch (e) {
@@ -96,41 +112,21 @@ form.onsubmit = async (ev) => {
     }
 }
 
-backward.onclick = () => {
+document.querySelector('#backward').onclick = () => {
     if (learnDeck.length <= 1) return;
-    pointer = (((pointer - 1) % learnDeck.length) + learnDeck.length) % learnDeck.length
+    p = (((p - 1) % learnDeck.length) + learnDeck.length) % learnDeck.length
     windowElement.innerHTML = ''
-    windowElement.append(Window(learnDeck[pointer]))
+    windowElement.append(Window(learnDeck[p]))
 }
 
-forward.onclick = () => {
+document.querySelector('#forward').onclick = () => {
     if (learnDeck.length <= 1) return;
-    pointer = (pointer + 1) % learnDeck.length
+    p = (p + 1) % learnDeck.length
     windowElement.innerHTML = ''
-    windowElement.append(Window(learnDeck[pointer]))
+    windowElement.append(Window(learnDeck[p]))
 }
 
-function Row({id, question, answer, learned}) {
-    const row = document.createElement('tr')
-    row.className = "flashcards-row"
-    row.dataset.learned = learned
-    row.innerHTML = `
-        <td class="flashcards-cell cell-id centered">${id}</td>
-        <td class="flashcards-cell cell-question">${question}</td>
-        <td class="flashcards-cell cell-answer">${answer}</td>
-        <td class="flashcards-cell cell-learned centered unselectable">${learned ? 'Learned' : 'Not learned'}</td>
-        <td class="flashcards-cell cell-edit centered unselectable">Edit</td>
-        <td class="flashcards-cell cell-delete centered unselectable">Delete</td>
-    `
-
-    row.querySelector('td.cell-delete').onclick = handleDelete(row, id)
-    row.querySelector('td.cell-edit').onclick = handleEdit(row, id)
-    row.querySelector('td.cell-learned').onclick = handleSwitch(row, id)
-
-    return row;
-}
-
-const handleDelete = (row, id) => {
+const handleDelete = (id) => {
     return async () => {
         try {
             const resp = await fetch(`/api/cards/${id}`, {
@@ -150,10 +146,11 @@ const handleDelete = (row, id) => {
                 windowElement.textContent = 'No cards'
             } else {
                 windowElement.innerHTML = ''
-                windowElement.append(Window(learnDeck[pointer]))
+                windowElement.append(Window(learnDeck[p]))
             }
 
-            row.remove()
+            // removes row
+            getRow(id).remove()
 
         } catch (e) {
             return console.error(e)
@@ -161,10 +158,12 @@ const handleDelete = (row, id) => {
     }
 }
 
-const handleEdit = (row, id) => {
+const handleEdit = (id) => {
     return async (ev) => {
-        document.querySelector('form input[name="question"]').value = ev.currentTarget.parentElement.parentElement.querySelector('td.cell-question').innerHTML
-        document.querySelector('form input[name="answer"]').value = ev.currentTarget.parentElement.parentElement.querySelector('td.cell-answer').innerHTML
+        document.querySelector('form input[name="question"]').value = ev.currentTarget.parentElement.parentElement.querySelector('td.cell-question').textContent.trim()
+        document.querySelector('form input[name="answer"]').value = ev.currentTarget.parentElement.parentElement.querySelector('td.cell-answer').textContent.trim()
+
+        const row = getRow(id)
 
         document.querySelector('form').dataset.learned_temp = row.dataset.learned
 
@@ -182,12 +181,13 @@ const handleEdit = (row, id) => {
             return console.error(e)
         }
 
-        row.remove()
+        // removes row
+        getRow(id).remove()
     }
 }
 
-const handleSwitch = (row, id) => {
-    return async (ev) => {
+const handleSwitch = (id) => {
+    return async () => {
         try {
             const resp = await fetch(`/api/cards/${id}`, {
                 method: 'PUT',
@@ -199,16 +199,17 @@ const handleSwitch = (row, id) => {
                 throw new Error(data.error)
             }
 
-            cards.map((c, i, a) => {
+            cards.forEach((c, i, a) => {
                 if (c.id === id) a[i].learned = data.learned
             })
 
+            // find row
+            const row = getRow(id)
+
             row.dataset.learned = data.learned
-            ev.target.textContent = data.learned ? 'Learned' : 'Not learned'
+            row.querySelector('.cell-learned').textContent = data.learned ? 'Learned' : 'Not learned'
 
             learnDeck = selectLearnable(cards)
-            console.log(cards)
-            console.log(learnDeck)
         } catch (e) {
             console.error(e)
         }
@@ -222,8 +223,8 @@ const handleSelectMode = () => {
         windowElement.textContent = 'No cards'
     } else {
         windowElement.innerHTML = ''
-        pointer = 0
-        windowElement.append(Window(learnDeck[pointer]))
+        p = 0
+        windowElement.append(Window(learnDeck[p]))
     }
 }
 
