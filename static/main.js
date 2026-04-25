@@ -1,8 +1,7 @@
 "use strict";
 
-import Window from "./learn.js";
 import Card from "./card.js";
-import Prewiew from "./learn.js";
+import Preview from "./learn.js";
 
 const form = document.querySelector('form')
 const deck = document.querySelector('#flashcards-deck > tbody')
@@ -16,6 +15,7 @@ const counter = document.querySelector('div#counter')
 let cards = []
 let learnDeck = []
 let p = 0
+let editingCard = null
 
 const getRow = (id) => {
     let row
@@ -31,7 +31,7 @@ const getRow = (id) => {
 const selectLearnable = (cards) => {
     return cards.filter(c => {
         if (inputLearned.checked === false && inputNotLearned.checked === false) return false;
-        return c.learned === inputLearned.checked | c.learned === !inputNotLearned.checked
+        return c.learned === inputLearned.checked || c.learned !== inputNotLearned.checked
     })
 }
 
@@ -65,8 +65,8 @@ window.onload = async () => {
         if (learnDeck.length === 0) {
             windowElement.textContent = 'No cards'
         } else {
-            const prewiew = new Prewiew(learnDeck[p]).toElement()
-            windowElement.append(prewiew)
+            const preview = new Preview(learnDeck[p]).toElement()
+            windowElement.append(preview)
         }
     } catch (e) {
         console.error(e)
@@ -97,11 +97,10 @@ form.onsubmit = async (ev) => {
             throw new Error(data.error)
         }
 
-        // temporary variable to track the edited card's state
-        const learned_temp = form.dataset.learned_temp
-        if (learned_temp !== 'null') {
-            data.learned = learned_temp
-            form.dataset.learned_temp = 'null'
+        // preserve learned state from edited card
+        if (editingCard) {
+            data.learned = editingCard.learned
+            editingCard = null
         }
 
         const new_card = new Card(data)
@@ -111,8 +110,8 @@ form.onsubmit = async (ev) => {
 
         if (learnDeck.length === 1) {
             windowElement.innerHTML = ''
-            const prewiew = new Prewiew(learnDeck[p]).toElement()
-            windowElement.append(prewiew)
+            const preview = new Preview(learnDeck[p]).toElement()
+            windowElement.append(preview)
         }
 
         const row = new_card.toElement(
@@ -130,21 +129,18 @@ form.onsubmit = async (ev) => {
     }
 }
 
-document.querySelector('#backward').onclick = () => {
-    if (learnDeck.length <= 1) return;
-    decrement(p, learnDeck.length)
-    windowElement.innerHTML = ''
-    const prewiew = new Prewiew(learnDeck[p]).toElement()
-    windowElement.append(prewiew)
+const movePreview = (func) => {
+    return (ev) => {
+        if (learnDeck.length <= 1) return;
+        p = func(p, learnDeck.length)
+        windowElement.innerHTML = ''
+        const preview = new Preview(learnDeck[p]).toElement()
+        windowElement.append(preview)
+    }
 }
 
-document.querySelector('#forward').onclick = () => {
-    if (learnDeck.length <= 1) return;
-    increment(ptr, learnDeck.length)
-    windowElement.innerHTML = ''
-    const prewiew = new Prewiew(learnDeck[p]).toElement()
-    windowElement.append(prewiew)
-}
+document.querySelector('#backward').onclick = movePreview(decrement)
+document.querySelector('#forward').onclick = movePreview(increment)
 
 const handleDelete = (id) => {
     return async () => {
@@ -162,12 +158,17 @@ const handleDelete = (id) => {
             cards = cards.filter(c => c.id !== id)
             learnDeck = selectLearnable(cards)
 
+            // fix index if it's out of bounds
+            if (p >= learnDeck.length && learnDeck.length > 0) {
+                p = learnDeck.length - 1
+            }
+
             if (learnDeck.length === 0) {
                 windowElement.textContent = 'No cards'
             } else {
                 windowElement.innerHTML = ''
-                const prewiew = new Prewiew(learnDeck[p]).toElement()
-                windowElement.append(prewiew)
+                const preview = new Preview(learnDeck[p]).toElement()
+                windowElement.append(preview)
             }
 
             // removes row
@@ -186,7 +187,8 @@ const handleEdit = (id) => {
 
         const row = getRow(id)
 
-        document.querySelector('form').dataset.learned_temp = row.dataset.learned
+        // save the editing card to preserve its learned state
+        editingCard = cards.find(c => c.id === id)
 
         try {
             const resp = await fetch(`/api/cards/${id}`, {
@@ -244,8 +246,8 @@ const handleSelectMode = () => {
     } else {
         windowElement.innerHTML = ''
         p = 0
-        const prewiew = new Prewiew(learnDeck[p]).toElement()
-        windowElement.append(prewiew)
+        const preview = new Preview(learnDeck[p]).toElement()
+        windowElement.append(preview)
     }
 }
 

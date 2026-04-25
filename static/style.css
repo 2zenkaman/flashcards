@@ -104,7 +104,7 @@ td.cell-question, td.cell-answer {
 
 tr.flashcards-row[data-learned="true"] {
     background-color: green;
-    color: var(--primary-color)
+    color: var(--primary-color);
 }
 
 tr.flashcards-row[data-learned="false"] {

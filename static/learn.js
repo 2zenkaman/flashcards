@@ -1,4 +1,4 @@
-export default class Prewiew {
+export default class Preview {
     question
     answer
     learned
