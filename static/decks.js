@@ -9,9 +9,11 @@ export class Deck {
     }
 
     flip(id) {
-        this.data.forEach((c, i, a) => {
-            if (c.id === id) a[i].learned = !a[i].learned
-        })
+        for (let i = 0; i < this.data.length; i++) {
+            if (this.data[i].id === id) {
+                this.data[i].learned = !this.data[i].learned;
+            }
+        }
     }
 
     find(id) {
