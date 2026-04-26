@@ -219,6 +219,26 @@ const handleSwitch = (id) => {
     }
 }
 
+const handleCardAction = (id, {server, local, html}) => {
+    return async () => {
+        try {
+            const data = await server(id)
+
+            local(id)
+
+            const row = getRow(id)
+
+            html(row, data)
+
+            learnData.deck = selectLearnable(cards.deck)
+
+            updateButtonsState()
+        } catch (e) {
+            console.error(e)
+        }
+    }
+}
+
 const handleSelectMode = () => {
     learnData.deck = selectLearnable(cards.deck)
     updateLearnState(true)
