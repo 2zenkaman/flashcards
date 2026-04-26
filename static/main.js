@@ -20,6 +20,12 @@ const learnData = {
     increment() {
         this.p = (this.p + 1) % this.deck.length
     },
+
+    normalize() {
+        if (this.p >= this.deck.length) {
+            this.p = 0
+        }
+    }
 }
 
 const cards = {
@@ -136,18 +142,13 @@ const action = (id = null, {pre, server, local, html} = {}) => {
         try {
             const data = server ? await server(id) : null
 
-            if (local) {
-                local(id, data)
-            }
+            if (local) local(id, data)
 
             const row = getRow(id)
-
-            if (html) {
-                html(row, data)
-            }
+            if (html) html(row, data)
 
             learnData.deck = selectLearnable(cards.deck)
-
+            learnData.normalize()
             updateLearnState()
         } catch (e) {
             console.error(e)
