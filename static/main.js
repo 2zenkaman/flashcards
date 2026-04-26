@@ -182,11 +182,6 @@ const handleFormSubmition = action(null, {
     html: () => document.querySelectorAll('form input').forEach(i => i.value = ''),
 })
 
-const handleSelectMode = () => {
-    learnData.deck = selectLearnable(cards.deck)
-    updateLearnState(true)
-}
-
 window.onload = async () => {
     document.querySelectorAll('form input').forEach(i => i.value = '')
 
@@ -203,16 +198,22 @@ window.onload = async () => {
     }
 
     document.querySelector('form').onsubmit = handleFormSubmition
-    document.querySelector('input[name="not-learned"]').onclick = handleSelectMode
-    document.querySelector('input[name="learned"]').onclick = handleSelectMode
+
+    // empty action updates the learnable deck and learn state, so it is used for checkboxes
+    document.querySelector('input[name="not-learned"]').onclick = action()
+    document.querySelector('input[name="learned"]').onclick = action()
+    
     document.querySelector('#flashcards-window').onclick = handleFlipAnimation(() => learnData.deck.length > 0)
 
-    document.querySelector('#backward').onclick = () => {
-        learnData.decrement()
-        updateLearnState()
-    }
-    document.querySelector('#forward').onclick = () => {
-        learnData.increment()
-        updateLearnState()
-    }
+    document.querySelector('#backward').onclick = action(null, {
+        server: null,
+        local: () => learnData.decrement(),
+        html: () => updateLearnState()
+    })
+
+    document.querySelector('#forward').onclick = action(null, {
+        server: null,
+        local: () => learnData.increment(),
+        html: () => updateLearnState()
+    })
 }
