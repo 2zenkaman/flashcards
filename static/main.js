@@ -52,6 +52,13 @@ const cards = {
     last() {
         return this.deck[this.deck.length - 1]
     },
+
+    shuffle() {
+        for (let i = this.deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this.deck[i], this.deck[j]] = [this.deck[j], this.deck[i]];
+        }
+    }
 }
 
 const render = (cardList) => {
@@ -190,6 +197,11 @@ window.onload = async () => {
     })()
 
     document.querySelector('form').onsubmit = handleFormSubmition
+
+    document.querySelector('#shuffle').onclick = action(null, {
+        local: () => cards.shuffle(),
+        html: () => render(cards.deck)
+    })
 
     // empty action updates the learnable deck and learn state, so it is used for checkboxes
     document.querySelector('input[name="not-learned"]').onclick = action()
