@@ -2,6 +2,8 @@
 
 import Preview from "./preview.js";
 
+import {Deck, PointedDeck} from "./deck.js";
+
 import handleFlipAnimation from "./animations.js";
 import {postCard, deleteCard, switchLearned, getCards} from "./api.js"
 

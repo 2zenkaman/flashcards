@@ -1,4 +1,4 @@
-class Deck {
+export class Deck {
     data = []
     constructor() {
         this.data = []
@@ -31,5 +31,32 @@ class Deck {
             const j = Math.floor(Math.random() * (i + 1));
             [this.data[i], this.data[j]] = [this.data[j], this.data[i]];
         }
+    }
+}
+
+export class PointedDeck {
+    data = []
+    p = 0
+
+    constructor() {
+        this.data = []
+        this.p = 0
+    }
+    
+    current() {
+        return this.data[this.p]
+    }
+    
+    forward() {
+        if (this.p < this.data.length - 1) this.p++
+    }
+    
+    backward() {
+        if (this.p > 0) this.p--
+    }
+
+    normalize() {
+        if (this.p >= this.data.length) this.p = this.data.length - 1
+        if (this.p < 0) this.p = 0
     }
 }
