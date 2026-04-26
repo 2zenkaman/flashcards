@@ -21,7 +21,16 @@ const render = (cardList) => {
 }
 
 let editingCard = null
-let currentDeckID = null
+let currentDeck = {
+    id: null,
+    name: null,
+}
+
+const updateStats = () => {
+    document.querySelector('#total-cards').textContent = cards.data.length
+    document.querySelector('#learned-cards').textContent = cards.data.filter(c => c.learned).length
+    document.querySelector('#deck-name').textContent = currentDeck.name ? `(${currentDeck.name})` : ''
+}
 
 const action = ({pre, server, local, html} = {}, reset = false) => {
     return async (ev) => {
@@ -35,6 +44,8 @@ const action = ({pre, server, local, html} = {}, reset = false) => {
             learnData.normalize()
             updateLearnState()
             updateCounterState(learnData)
+
+            updateStats()
 
             if (reset) {
                 render(cards.data)
@@ -83,7 +94,8 @@ const deck = (d) => {
         onselect: action({
             server: async () => await getCards(d.id),
             local: data => {
-                currentDeckID = d.id
+                currentDeck.id = d.id
+                currentDeck.name = d.name
                 cards.data = data
             },
             html: () => {
@@ -115,7 +127,7 @@ const updateButtonsState = () => {
 }
 
 const updateLearnState = () => {
-    const windowElement = document.querySelector('#flashcards-window')
+    const windowElement = document.querySelector('#question-answer')
     if (learnData.data.length === 0) {
         windowElement.textContent = 'No cards to learn.'
     } else {
@@ -212,7 +224,7 @@ window.onload = async () => {
     document.querySelector('input[name="not-learned"]').onclick = action()
     document.querySelector('input[name="learned"]').onclick = action()
     
-    document.querySelector('#flashcards-window').onclick = handleFlipAnimation(() => learnData.data.length > 0)
+    document.querySelector('#question-answer').onclick = handleFlipAnimation(() => learnData.data.length > 0)
 
     document.querySelector('#backward').onclick = action({
         local: () => learnData.backward(),

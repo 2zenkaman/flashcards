@@ -6,6 +6,7 @@
     <title>Flashcards</title>
     <link rel="stylesheet" href="static/style.css">
     <link rel="stylesheet" href="static/side-panel.css">
+    <link rel="stylesheet" href="static/window.css">
 </head>
 <body>
     <aside class="side-panel">
@@ -13,11 +14,22 @@
             <h1>FLASHCARDS</h1>
         </div>
         <div class="decks">
-            <div class="panel-group-heading">My decks</div>
+            <div class="panel-group-heading bold heading">My decks</div>
             <div class="panel-group">
                 <div class="new-deck">
                     <div class="unselectable">New deck</div>
                 </div>
+            </div>
+        </div>
+        <div class="stats">
+            <div class="bold heading">Statistics <span id="deck-name"></span></div>
+            <div class="field">
+                <div class="unselectable">Total cards:</div>
+                <div id="total-cards">0</div>
+            </div>
+            <div class="field">
+                <div class="unselectable">Learned cards:</div>
+                <div id="learned-cards">0</div>
             </div>
         </div>
     </aside>
@@ -70,10 +82,12 @@
         </table>
         <div id="flashcards-learn">
             <div id="counter"></div>
-            <div id="flashcards-window" class="centered unselectable"></div>
-            <div id="controls">
+            <div id="flashcards-window" class="centered unselectable">
                 <button id="backward" class="bold">Backward</button>
+                <div id="question-answer"></div>
                 <button id="forward" class="bold">Forward</button>
+            </div>
+            <div id="controls">
             </div>
         </div>
     </main>

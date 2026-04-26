@@ -1,0 +1,25 @@
+#flashcards-window {
+    height: 16em;
+    border: 1px solid var(--primary-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#flashcards-window #question-answer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em;
+}
+
+#flashcards-window .window {
+    transition: all 0.3s linear;
+}
+
+#flashcards-window button {
+    height: 100%;
+    border-radius: unset;
+}
