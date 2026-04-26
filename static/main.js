@@ -5,16 +5,6 @@ import Preview from "./preview.js";
 import handleFlipAnimation from "./animations.js";
 import {postCard, deleteCard, switchLearned, getCards} from "./api.js"
 
-const vault = {
-    question: null,
-    answer: null,
-
-    save(question, answer) {
-        this.question = question
-        this.answer = answer
-    },
-}
-
 const learnData = {
     deck: [],
     p: 0,
@@ -165,19 +155,15 @@ const action = (id = null, {pre, server, local, html} = {}) => {
 }
 
 const handleFormSubmition = action(null, {
-    pre: (ev) => {
-        ev.preventDefault()
-
-        const form = ev.currentTarget
-
+    pre: (ev) => ev.preventDefault(),
+    server: async () => {
         const req = {
-            question: form.querySelector('input[name="question"]').value.trim(),
-            answer:   form.querySelector('input[name="answer"]').value.trim(),
+            question: document.querySelector('form input[name="question"]').value.trim(),
+            answer:   document.querySelector('form input[name="answer"]').value.trim(),
         }
 
-        vault.save(req.question, req.answer)
+        return await postCard(req)
     },
-    server: async () => await postCard(vault),
     local: (id, data) => {
         cards.push(data)
         
