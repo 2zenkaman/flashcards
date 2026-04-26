@@ -22,7 +22,37 @@ let learnData = {
     },
 }
 
-let cards = []
+let cards = {
+    deck: [],
+
+    render() {
+        const table = document.querySelector('#flashcards-deck > tbody')
+        table.innerHTML = ''
+
+        this.deck.forEach(c => {
+            const row = c.toElement(
+                handleDelete(c.id), 
+                handleEdit(c.id), 
+                handleSwitch(c.id)
+            )
+            table.appendChild(row)
+        })
+    },
+
+    push(c) {
+        this.deck.push(c)
+
+        const table = document.querySelector('#flashcards-deck > tbody')
+
+        const row = c.toElement(
+            handleDelete(c.id), 
+            handleEdit(c.id), 
+            handleSwitch(c.id)
+        )
+        table.appendChild(row)
+    },
+}
+
 let editingCard = null
 
 const getRow = (id) => {
@@ -79,14 +109,14 @@ const handleFormSubmition = async (ev) => {
     try {
         const new_card = await postCard(req)
 
+        cards.push(new_card)
+        learnData.deck = selectLearnable(cards)
+
         // preserve learned state from edited card
         if (editingCard) {
             new_card.learned = editingCard.learned
             editingCard = null
         }
-
-        cards.push(new_card)
-        learnData.deck = selectLearnable(cards)
 
         updateLearnState()
 
@@ -108,6 +138,7 @@ const handleFormSubmition = async (ev) => {
 const handleDelete = (id) => {
     return async () => {
         try {
+            // delete card on server
             await deleteCard(id)
 
             // delete card locally by id
@@ -121,7 +152,7 @@ const handleDelete = (id) => {
 
             updateLearnState()
 
-            // removes row
+            // removes row in html
             getRow(id).remove()
 
         } catch (e) {
@@ -199,14 +230,7 @@ window.onload = async () => {
         cards = await getCards()
         learnData.deck = selectLearnable(cards)
 
-        cards.forEach(c => {
-            const row = c.toElement(
-                handleDelete(c.id),
-                handleEdit(c.id),
-                handleSwitch(c.id)
-            )
-            document.querySelector('#flashcards-deck > tbody').appendChild(row)
-        })
+        cards.render()
 
         updateLearnState()
 
