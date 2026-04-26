@@ -143,6 +143,14 @@ const updateLearnState = (reset = false) => {
     updateButtonsState()
 }
 
+const post = () => {
+    learnData.deck = selectLearnable(cards.deck)
+    learnData.normalize()
+    updateLearnState()
+    document.querySelector('#counter').textContent = `${learnData.p + 1} / ${learnData.deck.length}`
+    document.querySelector('#counter').hidden = learnData.deck.length === 0
+}
+
 const action = (id = null, {pre, server, local, html} = {}) => {
     return async (ev) => {
         if (pre) pre(ev)
@@ -154,10 +162,7 @@ const action = (id = null, {pre, server, local, html} = {}) => {
             const row = getRow(id)
             if (html) html(row, data)
 
-            learnData.deck = selectLearnable(cards.deck)
-            learnData.normalize()
-            updateLearnState()
-            document.querySelector('#counter').textContent = `${learnData.p + 1} / ${learnData.deck.length}`
+            post()
         } catch (e) {
             console.error(e)
         }
