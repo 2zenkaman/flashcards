@@ -152,7 +152,7 @@ const handleCardFormSubmition = action({
             answer:   document.querySelector('form input[name="answer"]').value.trim(),
         }
 
-        return await postCard({deck_id: currentDeckID, ...req})
+        return await postCard({deck_id: currentDeck.id, ...req})
     },
     local: (data) => {
         cards.push(data)
