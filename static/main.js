@@ -37,26 +37,28 @@ const getRow = (id) => {
 }
 
 const row = (c) => {
-    return c.toElement(
-        action(c.id, {
+    return c.toElement({
+        ondelete: action(c.id, {
             server: deleteCard,
             local: id => cards.remove(id),
             html: (row) => row.remove()
         }),
-        action(c.id, {
+        onedit: action(c.id, {
             pre: () => {
                 const row = getRow(c.id)
                 document.querySelector('form input[name="question"]').value = row.querySelector('td.cell-question').textContent.trim()
                 document.querySelector('form input[name="answer"]').value = row.querySelector('td.cell-answer').textContent.trim()
-
-                // save the editing card to preserve its learned state
-                editingCard = cards.find(c => c.id === id)
             },
-            server: deleteCard,
-            local: id => cards.remove(id),
-            html: (row) => row.remove()
+            server: postCard,
+            local: (id, data) => {
+                cards.replace(id, data)
+            },
+            html: (row, data) => {
+                row.querySelector('td.cell-question').textContent = data.question
+                row.querySelector('td.cell-answer').textContent = data.answer
+            }
         }),
-        action(c.id, {
+        onswitch: action(c.id, {
             server: switchLearned,
             local: id => cards.flip(id),
             html: (row, data) => {
@@ -64,7 +66,7 @@ const row = (c) => {
                 row.querySelector('.cell-learned').textContent = data.learned ? 'Learned' : 'Not learned'
             }
         })
-    )
+    })
 }
 
 const deck = (d) => {

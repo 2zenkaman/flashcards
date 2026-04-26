@@ -11,7 +11,7 @@ export default class Card {
         this.learned = learned
     }
 
-    toElement(ondelete, onedit, onswitch) {
+    toElement({ondelete, onedit, onswitch}) {
         const row = document.createElement('tr')
         row.className = "flashcards-row"
         row.dataset.learned = this.learned
