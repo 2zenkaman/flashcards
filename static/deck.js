@@ -7,12 +7,18 @@ export default class Deck {
         this.name = name
     }
 
-    toElement() {
+    toElement({onselect, ondelete}) {
         const preview = document.createElement('div')
-        preview.classList.add('deck')
+        preview.classList.add('deck', 'unselectable')
         preview.dataset.deckId = this.id
         preview.dataset.selected = false
-        preview.textContent = this.name
+        preview.innerHTML = `
+            <div>${this.name}</div>
+            <div class="cell-delete centered unselectable">Delete</div>
+        `
+
+        preview.onclick = onselect
+        preview.querySelector('.cell-delete').onclick = ondelete
     
         return preview
     }

@@ -6,7 +6,7 @@ import {Deck, PointedDeck} from "./decks.js";
 
 import handleFlipAnimation from "./animations.js";
 import { postCard, deleteCard, switchLearned, getCards } from "./api.js"
-import { postDeck, getDecks } from "./api.js";
+import { postDeck, getDecks, deleteDeck } from "./api.js";
 
 const learnData = new PointedDeck()
 const cards = new Deck()
@@ -38,27 +38,25 @@ const getRow = (id) => {
 
 const row = (c) => {
     return c.toElement({
-        ondelete: action(c.id, {
-            server: deleteCard,
+        ondelete: action({
+            server: async () => await deleteCard(c.id, c.deck_id),
             local: id => cards.remove(id),
             html: (row) => row.remove()
         }),
-        onedit: action(c.id, {
+        onedit: action({
             pre: () => {
                 const row = getRow(c.id)
                 document.querySelector('form input[name="question"]').value = row.querySelector('td.cell-question').textContent.trim()
                 document.querySelector('form input[name="answer"]').value = row.querySelector('td.cell-answer').textContent.trim()
+
+                // save the editing card to preserve its learned state
+                editingCard = cards.find(c => c.id === id)
             },
-            server: postCard,
-            local: (id, data) => {
-                cards.replace(id, data)
-            },
-            html: (row, data) => {
-                row.querySelector('td.cell-question').textContent = data.question
-                row.querySelector('td.cell-answer').textContent = data.answer
-            }
+            server: async () => deleteCard(c.id, c.deck_id),
+            local: () => cards.remove(c.id),
+            html: () => getRow(c.id).remove()
         }),
-        onswitch: action(c.id, {
+        onswitch: action({
             server: switchLearned,
             local: id => cards.flip(id),
             html: (row, data) => {
@@ -70,7 +68,21 @@ const row = (c) => {
 }
 
 const deck = (d) => {
-    return d.toElement()
+    return d.toElement({
+        onselect: action({
+            server: async () => await getCards(d.id),
+            local: data => currentDeck = data,
+            html: () => {
+                document.querySelectorAll('.side-panel .deck').forEach(s => s.dataset.selected = false)
+                document.querySelector(`.side-panel .deck[data-deck-id="${d.id}"]`).dataset.selected = true
+            },
+        }),
+        ondelete: action({
+            server: async () => await deleteDeck(d.id),
+            local: id => decks.remove(id),
+            html: (data) => element.remove()
+        })
+    })
 }
 
 const selectLearnable = (cards) => {
@@ -114,17 +126,13 @@ const post = () => {
     updateCounterState(learnData)
 }
 
-const action = (id = null, {pre, server, local, html} = {}) => {
+const action = ({pre, server, local, html} = {}) => {
     return async (ev) => {
         if (pre) pre(ev)
         try {
-            const data = server ? await server(id) : null
-
-            if (local) local(id, data)
-
-            const row = getRow(id)
-            if (html) html(row, data)
-
+            const data = server ? await server() : null
+            if (local) local(data)
+            if (html) html(data)
             post()
         } catch (e) {
             console.error(e)
@@ -132,7 +140,7 @@ const action = (id = null, {pre, server, local, html} = {}) => {
     }
 }
 
-const handleCardFormSubmition = action(null, {
+const handleCardFormSubmition = action({
     pre: (ev) => ev.preventDefault(),
     server: async () => {
         const req = {
@@ -156,7 +164,7 @@ const handleCardFormSubmition = action(null, {
     },
 })
 
-const handleNewDeckClick = action(null, {
+const handleNewDeckClick = action({
     html: () => {
         const item = document.querySelector('.panel-group .new-deck')
         if (item.querySelector('form')) return
@@ -166,14 +174,16 @@ const handleNewDeckClick = action(null, {
 
         const form = document.createElement('form')
         form.appendChild(input)
-        form.onsubmit = action(null, {
+
+        form.onsubmit = action({
             pre: (ev) => ev.preventDefault(),
             server: async () => {
                 if (input.value.trim() === '') return
                 return await postDeck({name: input.value})
             },
-            html: () => {
+            html: (data) => {
                 item.innerHTML = `<div class="unselectable">New deck</div>`
+                document.querySelector('.panel-group').appendChild(deck(data))
             }
         })
 
@@ -185,24 +195,24 @@ const handleNewDeckClick = action(null, {
 window.onload = async () => {
     document.querySelectorAll('form input').forEach(i => i.value = '')
 
-    action(null, {
-        server: getDecks,
-        local: (id, data) => decks.push(...data),
+    action({
+        server: async () => await getDecks(),
+        local: (data) => decks.push(...data),
         html: () => {
             const panelGroup = document.querySelector('.panel-group')
-            decks.forEach(d => panelGroup.appendChild(d.toElement()))
+            decks.forEach(d => panelGroup.appendChild(deck(d)))
         }
     })()
 
     document.querySelector('.side-panel .new-deck').onclick = handleNewDeckClick
     document.querySelector('.head form').onsubmit = handleCardFormSubmition
 
-    document.querySelector('#shuffle').onclick = action(null, {
+    document.querySelector('#shuffle').onclick = action({
         local: () => cards.shuffle(),
         html: () => render(cards.deck),
     })
 
-    document.querySelector('#reset').onclick = action(null, {
+    document.querySelector('#reset').onclick = action({
         local: () => cards.deck.sort((a, b) => a.id - b.id),    
         html: () => render(cards.deck),
     })
@@ -213,11 +223,11 @@ window.onload = async () => {
     
     document.querySelector('#flashcards-window').onclick = handleFlipAnimation(() => learnData.deck.length > 0)
 
-    document.querySelector('#backward').onclick = action(null, {
+    document.querySelector('#backward').onclick = action({
         local: () => learnData.decrement(),
     })
 
-    document.querySelector('#forward').onclick = action(null, {
+    document.querySelector('#forward').onclick = action({
         local: () => learnData.increment(),
     })
 }

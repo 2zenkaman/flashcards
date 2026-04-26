@@ -1,11 +1,13 @@
 export default class Card {
     id
+    deck_id
     question
     answer
     learned
 
-    constructor({id, question, answer, learned}) {
+    constructor({id, deck_id, question, answer, learned}) {
         this.id = id
+        this.deck_id = deck_id
         this.question = question
         this.answer = answer
         this.learned = learned
@@ -13,7 +15,7 @@ export default class Card {
 
     toElement({ondelete, onedit, onswitch}) {
         const row = document.createElement('tr')
-        row.className = "flashcards-row"
+        row.classList.add('flashcards-row')
         row.dataset.learned = this.learned
         row.innerHTML = `
             <td class="flashcards-cell cell-id centered">${this.id}</td>

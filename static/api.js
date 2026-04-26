@@ -1,8 +1,8 @@
 import Card from "./card.js";
 import Deck from "./deck.js";
 
-export async function postCard({question, answer}) {
-    const resp = await fetch('/api/cards', {
+export async function postCard({deck_id, question, answer}) {
+    const resp = await fetch(`/api/cards/${deck_id}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -19,8 +19,8 @@ export async function postCard({question, answer}) {
     return new Card(data)
 }
 
-export async function getCards() {
-    const resp = await fetch('/api/cards')
+export async function getCards(deck_id) {
+    const resp = await fetch(`/api/cards/${deck_id}`)
 
     const data = await resp.json()
 
@@ -31,8 +31,8 @@ export async function getCards() {
     return data.map(c => new Card(c))
 }
 
-export async function deleteCard(id) {
-    const resp = await fetch(`/api/cards/${id}`, {
+export async function deleteCard(id, deck_id) {
+    const resp = await fetch(`/api/cards/${deck_id}/${id}`, {
         method: 'DELETE',
     })
 
@@ -42,8 +42,8 @@ export async function deleteCard(id) {
     }
 }
 
-export async function switchLearned(id) {
-    const resp = await fetch(`/api/cards/${id}`, {
+export async function switchLearned(id, deck_id) {
+    const resp = await fetch(`/api/cards/${deck_id}/${id}`, {
         method: 'PUT',
     })
 
@@ -86,4 +86,15 @@ export async function getDecks() {
     }
 
     return data.map(d => new Deck(d))
+}
+
+export async function deleteDeck(id) {
+    const resp = await fetch(`/api/decks/${id}`, {
+        method: 'DELETE',
+    })
+
+    if (!resp.ok) {
+        const data = await resp.json()
+        throw new Error(data.error)
+    }
 }

@@ -57,3 +57,13 @@
     font-size: 1rem;
     padding: 0;
 }
+
+.side-panel .deck {
+    display: flex;
+    justify-content: space-between;
+}
+
+.side-panel .deck[data-selected="true"] {
+    background-color: var(--primary-color);
+    color: rgb(13, 13, 16);
+}
