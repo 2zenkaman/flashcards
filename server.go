@@ -18,10 +18,10 @@ func main() {
 	engine.StaticFile("/", "./static/index.html")
 	engine.Static("/static", "./static")
 
-	engine.Handle("POST", "/api/cards", handlers.HandleCreateCard())
-	engine.Handle("GET", "/api/cards", handlers.HandleGetAllCards())
-	engine.Handle("PUT", "/api/cards/:id", handlers.HandleUpdateCard())
-	engine.Handle("DELETE", "/api/cards/:id", handlers.HandleDeleteCard())
+	engine.Handle("POST", "/api/cards/:deckid", handlers.HandleCreateCard())
+	engine.Handle("GET", "/api/cards/:deckid", handlers.HandleGetAllCards())
+	engine.Handle("PUT", "/api/cards/:deckid/:id", handlers.HandleUpdateCard())
+	engine.Handle("DELETE", "/api/cards/:deckid/:id", handlers.HandleDeleteCard())
 
 	engine.Handle("POST", "/api/decks", handlers.HandleCreateDeck())
 	engine.Handle("GET", "/api/decks", handlers.HandleGetAllDecks())

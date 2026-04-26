@@ -11,6 +11,12 @@ import (
 
 func HandleCreateCard() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		deckID, err := strconv.Atoi(ctx.Param("deckid"))
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Failed to parse deck id: %v", err)})
+			return
+		}
+
 		var req struct {
 			Question string `json:"question"`
 			Answer   string `json:"answer"`
@@ -22,6 +28,7 @@ func HandleCreateCard() gin.HandlerFunc {
 		}
 
 		card := models.Card{
+			DeckID:   deckID,
 			Question: req.Question,
 			Answer:   req.Answer,
 		}
@@ -37,7 +44,13 @@ func HandleCreateCard() gin.HandlerFunc {
 
 func HandleGetAllCards() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		cards, err := models.GetAllCards()
+		deckID, err := strconv.Atoi(ctx.Param("deckid"))
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Failed to parse deck id: %v", err)})
+			return
+		}
+
+		cards, err := models.GetAllCards(deckID)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to get cards: %v", err)})
 			return
@@ -49,13 +62,19 @@ func HandleGetAllCards() gin.HandlerFunc {
 
 func HandleUpdateCard() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		deckID, err := strconv.Atoi(ctx.Param("deckid"))
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Failed to parse deck id: %v", err)})
+			return
+		}
+
 		id, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Failed to parse id: %v", err)})
 			return
 		}
 
-		card, err := models.UpdateCard(id)
+		card, err := models.UpdateCard(id, deckID)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to update card: %v", err)})
 			return
@@ -67,13 +86,19 @@ func HandleUpdateCard() gin.HandlerFunc {
 
 func HandleDeleteCard() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		deckID, err := strconv.Atoi(ctx.Param("deckid"))
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Failed to parse deck id: %v", err)})
+			return
+		}
+
 		id, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Failed to parse id: %v", err)})
 			return
 		}
 
-		if err := models.DeleteCard(id); err != nil {
+		if err := models.DeleteCard(id, deckID); err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to delete card: %v", err)})
 			return
 		}
