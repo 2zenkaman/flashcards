@@ -80,7 +80,7 @@ const getRow = (id) => {
     return row
 }
 
-const row = (id) => {
+const row = (c) => {
     return c.toElement(
         action(c.id, {
             server: deleteCard,
