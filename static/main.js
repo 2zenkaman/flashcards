@@ -54,23 +54,25 @@ const row = (c) => {
         }),
         onedit: action({
             pre: () => {
-                const row = getRow(c.id)
+                const row = c.getElement()
                 document.querySelector('form input[name="question"]').value = row.querySelector('td.cell-question').textContent.trim()
                 document.querySelector('form input[name="answer"]').value = row.querySelector('td.cell-answer').textContent.trim()
 
                 // save the editing card to preserve its learned state
-                editingCard = cards.find(c => c.id === id)
+                editingCard = c
             },
-            server: async () => deleteCard(c.id, c.deck_id),
+            server: async () => {
+                await deleteCard(c.id, c.deck_id)
+            },
             local: () => cards.remove(c.id),
-            html: () => getRow(c.id).remove(),
+            html: () => c.getElement().remove(),
         }),
         onswitch: action({
-            server: switchLearned,
+            server: async () => await switchLearned(c.id, c.deck_id),
             local: id => cards.flip(id),
-            html: (row, data) => {
-                row.dataset.learned = data.learned
-                row.querySelector('.cell-learned').textContent = data.learned ? 'Learned' : 'Not learned'
+            html: (data) => {
+                c.getElement().dataset.learned = data.learned
+                c.getElement().querySelector('.cell-learned').textContent = data.learned ? 'Learned' : 'Not learned'
             }
         })
     })
@@ -82,7 +84,7 @@ const deck = (d) => {
             server: async () => await getCards(d.id),
             local: data => {
                 currentDeckID = d.id
-                cards.deck = data
+                cards.data = data
             },
             html: () => {
                 // highlight the selected deck
@@ -198,25 +200,25 @@ window.onload = async () => {
 
     document.querySelector('#shuffle').onclick = action({
         local: () => cards.shuffle(),
-        html: () => render(cards.deck),
+        html: () => render(cards.data),
     })
 
     document.querySelector('#reset').onclick = action({
-        local: () => cards.deck.sort((a, b) => a.id - b.id),    
-        html: () => render(cards.deck),
+        local: () => cards.data.sort((a, b) => a.id - b.id),    
+        html: () => render(cards.data),
     })
 
     // empty action updates the learnable deck and learn state, so it is used for checkboxes
     document.querySelector('input[name="not-learned"]').onclick = action()
     document.querySelector('input[name="learned"]').onclick = action()
     
-    document.querySelector('#flashcards-window').onclick = handleFlipAnimation(() => learnData.deck.length > 0)
+    document.querySelector('#flashcards-window').onclick = handleFlipAnimation(() => learnData.data.length > 0)
 
     document.querySelector('#backward').onclick = action({
-        local: () => learnData.decrement(),
+        local: () => learnData.backward(),
     })
 
     document.querySelector('#forward').onclick = action({
-        local: () => learnData.increment(),
+        local: () => learnData.forward(),
     })
 }

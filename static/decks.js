@@ -44,7 +44,6 @@ export class PointedDeck {
     }
     
     current() {
-        console.log(this.data, this.p)
         return this.data[this.p]
     }
     

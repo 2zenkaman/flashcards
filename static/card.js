@@ -17,6 +17,7 @@ export default class Card {
         const row = document.createElement('tr')
         row.classList.add('flashcards-row')
         row.dataset.learned = this.learned
+        row.dataset.card_id = this.id
         row.innerHTML = `
             <td class="flashcards-cell cell-id centered">${this.id}</td>
             <td class="flashcards-cell cell-question">${this.question}</td>
@@ -34,6 +35,6 @@ export default class Card {
     }
 
     getElement() {
-        return document.querySelector(`.flashcards-row .cell-id:contains("${this.id}")`).parentElement
+        return document.querySelector(`.flashcards-row[data-card_id="${this.id}"]`)
     }
 }

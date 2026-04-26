@@ -40,6 +40,7 @@ func GetAllCards(deckID int) ([]Card, error) {
 		if err := rows.Scan(&c.ID, &c.Question, &c.Answer, &c.Learned); err != nil {
 			return nil, err
 		}
+		c.DeckID = deckID
 		cards = append(cards, c)
 	}
 	return cards, nil
@@ -51,7 +52,7 @@ func UpdateCard(id int, deckID int) (*Card, error) {
 	}
 
 	var c Card
-	err := conn.QueryRow(context.Background(), "UPDATE cards SET learned = NOT learned WHERE id=$1 AND deck_id=$2 RETURNING *", id, deckID).Scan(&c.ID, &c.Question, &c.Answer, &c.Learned)
+	err := conn.QueryRow(context.Background(), "UPDATE cards SET learned = NOT learned WHERE id=$1 AND deck_id=$2 RETURNING *", id, deckID).Scan(&c.ID, &c.DeckID, &c.Question, &c.Answer, &c.Learned)
 	return &c, err
 }
 
