@@ -5,6 +5,16 @@ import Preview from "./preview.js";
 import handleFlipAnimation from "./animations.js";
 import {postCard, deleteCard, switchLearned, getCards} from "./api.js"
 
+const vault = {
+    question: null,
+    answer: null,
+
+    save(question, answer) {
+        this.question = question
+        this.answer = answer
+    },
+}
+
 const learnData = {
     deck: [],
     p: 0,
@@ -122,47 +132,14 @@ const updateLearnState = (reset = false) => {
     updateButtonsState()
 }
 
-const handleFormSubmition = async (ev) => {
-    ev.preventDefault()
-
-    // preserve the fucking form cause it is somehow lost after submit and I have no idea why, so I have to query it again
-    const form = ev.currentTarget
-
-    const req = {
-        question: document.querySelector('form input[name="question"]').value.trim(),
-        answer:   document.querySelector('form input[name="answer"]').value.trim(),
-    }
-
-    try {
-        const new_card = await postCard(req)
-
-        cards.push(new_card)
-        learnData.deck = selectLearnable(cards.deck)
-
-        // preserve learned state from edited card
-        if (editingCard) {
-            new_card.learned = editingCard.learned
-            editingCard = null
-        }
-
-        updateLearnState()
-
-        // clears inputs after card submition
-        form.querySelectorAll('input').forEach(i => i.value = '')
-
-    } catch (e) {
-        return console.error(e)
-    }
-}
-
-const action = (id, { pre, server, local, html}) => {
+const action = (id, {pre, server, local, html}) => {
     return async (ev) => {
         if (pre) pre(ev)
         try {
             const data = server ? await server(id) : null
 
             if (local) {
-                local(id)
+                local(id, data)
             }
 
             const row = getRow(id)
@@ -173,12 +150,37 @@ const action = (id, { pre, server, local, html}) => {
 
             learnData.deck = selectLearnable(cards.deck)
 
-            updateButtonsState()
+            updateLearnState()
         } catch (e) {
             console.error(e)
         }
     }
 }
+
+const handleFormSubmition = action(null, {
+    pre: (ev) => {
+        ev.preventDefault()
+
+        const form = ev.currentTarget
+
+        const req = {
+            question: form.querySelector('input[name="question"]').value.trim(),
+            answer:   form.querySelector('input[name="answer"]').value.trim(),
+        }
+
+        vault.save(req.question, req.answer)
+    },
+    server: async () => await postCard(vault),
+    local: (id, data) => {
+        cards.push(data)
+        
+        if (editingCard) {
+            data.learned = editingCard.learned
+            editingCard = null
+        }
+    },
+    html: () => document.querySelectorAll('form input').forEach(i => i.value = ''),
+})
 
 const handleSelectMode = () => {
     learnData.deck = selectLearnable(cards.deck)
