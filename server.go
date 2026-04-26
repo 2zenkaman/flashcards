@@ -23,5 +23,8 @@ func main() {
 	engine.Handle("PUT", "/api/cards/:id", handlers.HandleUpdateCard())
 	engine.Handle("DELETE", "/api/cards/:id", handlers.HandleDeleteCard())
 
+	engine.Handle("POST", "/api/decks", handlers.HandleCreateDeck())
+	engine.Handle("GET", "/api/decks", handlers.HandleGetAllDecks())
+
 	engine.Run(":8080")
 }
