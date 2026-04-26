@@ -52,6 +52,10 @@ const cards = {
     push(c) {
         this.deck.push(c)
     },
+
+    last() {
+        return this.deck[this.deck.length - 1]
+    },
 }
 
 const render = (cardList) => {
@@ -184,7 +188,7 @@ const handleFormSubmition = action(null, {
     },
     html: () => {
         document.querySelectorAll('form input').forEach(i => i.value = '')
-        document.querySelector('#flashcards-deck > tbody').appendChild(row(cards.deck[cards.deck.length - 1]))
+        document.querySelector('#flashcards-deck > tbody').appendChild(row(cards.last()))
     },
 })
 
