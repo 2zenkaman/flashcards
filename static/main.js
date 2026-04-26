@@ -44,7 +44,7 @@ const cards = {
     find(id) {
         return this.deck.find(c => c.id === id)
     },
- 
+
     push(c) {
         this.deck.push(c)
     },
@@ -210,6 +210,11 @@ window.onload = async () => {
 
     document.querySelector('#shuffle').onclick = action(null, {
         local: () => cards.shuffle(),
+        html: () => render(cards.deck),
+    })
+
+    document.querySelector('#reset').onclick = action(null, {
+        local: () => cards.deck.sort((a, b) => a.id - b.id),    
         html: () => render(cards.deck),
     })
 
