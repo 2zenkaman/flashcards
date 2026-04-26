@@ -54,3 +54,33 @@ export async function switchLearned(id) {
 
     return data
 }
+
+export async function postDeck({name}) {
+    const resp = await fetch('/api/decks', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({name})
+    })
+
+    const data = await resp.json()
+
+    if (!resp.ok) {
+        throw new Error(data.error)
+    }
+
+    return data
+}
+
+export async function getDecks() {
+    const resp = await fetch('/api/decks')
+
+    const data = await resp.json()
+
+    if (!resp.ok) {
+        throw new Error(data.error)
+    }
+
+    return data
+}
