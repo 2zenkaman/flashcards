@@ -16,6 +16,43 @@ body {
     display: flex;
     flex-direction: column;
     gap: 5em;
+    min-height: 100vh;
+}
+
+.side-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    padding: 20px;
+    background-color: rgb(13, 13, 16);
+    border-right: 1px solid var(--primary-color);
+    overflow-y: auto;
+    z-index: 10;
+}
+
+.side-panel .panel-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.side-panel .panel-item {
+    padding: 10px;
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+}
+
+@media (max-width: 950px) {
+    .side-panel {
+        position: static;
+        width: 100%;
+        height: auto;
+        border-left: none;
+        border-top: 1px solid var(--primary-color);
+    }
 }
 
 header {
