@@ -143,6 +143,7 @@ const updateLearnState = (reset = false) => {
     updateButtonsState()
 }
 
+// on every state update
 const post = () => {
     learnData.deck = selectLearnable(cards.deck)
     learnData.normalize()
