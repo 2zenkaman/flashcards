@@ -126,7 +126,7 @@ const selectLearnable = (cards) => {
 
 const updateButtonsState = () => {
     document.querySelector('#backward').disabled = learnData.p === 0
-    document.querySelector('#forward').disabled = learnData.p === learnData.deck.length - 1
+    document.querySelector('#forward').disabled = learnData.deck.length - learnData.p <= 1
 }
 
 const updateLearnState = (reset = false) => {
