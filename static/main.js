@@ -79,6 +79,7 @@ const row = (c) => {
         }),
         action(c.id, {
             pre: () => {
+                const row = getRow(c.id)
                 document.querySelector('form input[name="question"]').value = row.querySelector('td.cell-question').textContent.trim()
                 document.querySelector('form input[name="answer"]').value = row.querySelector('td.cell-answer').textContent.trim()
 
