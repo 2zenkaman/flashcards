@@ -59,34 +59,7 @@ const render = (cardList) => {
     table.innerHTML = ''
 
     cardList.forEach(c => {
-        const row = c.toElement(
-            action(c.id, {
-                server: deleteCard,
-                local: id => cards.remove(id),
-                html: (row) => row.remove()
-            }),
-            action(c.id, {
-                pre: () => {
-                    document.querySelector('form input[name="question"]').value = row.querySelector('td.cell-question').textContent.trim()
-                    document.querySelector('form input[name="answer"]').value = row.querySelector('td.cell-answer').textContent.trim()
-
-                    // save the editing card to preserve its learned state
-                    editingCard = cards.find(c => c.id === id)
-                },
-                server: deleteCard,
-                local: id => cards.remove(id),
-                html: (row) => row.remove()
-            }),
-            action(c.id, {
-                server: switchLearned,
-                local: id => cards.flip(id),
-                html: (row, data) => {
-                    row.dataset.learned = data.learned
-                    row.querySelector('.cell-learned').textContent = data.learned ? 'Learned' : 'Not learned'
-                }
-            })
-        )
-        table.appendChild(row)
+        table.appendChild(row(c))
     })
 }
 
@@ -101,6 +74,36 @@ const getRow = (id) => {
     })
 
     return row
+}
+
+const row = (id) => {
+    return c.toElement(
+        action(c.id, {
+            server: deleteCard,
+            local: id => cards.remove(id),
+            html: (row) => row.remove()
+        }),
+        action(c.id, {
+            pre: () => {
+                document.querySelector('form input[name="question"]').value = row.querySelector('td.cell-question').textContent.trim()
+                document.querySelector('form input[name="answer"]').value = row.querySelector('td.cell-answer').textContent.trim()
+
+                // save the editing card to preserve its learned state
+                editingCard = cards.find(c => c.id === id)
+            },
+            server: deleteCard,
+            local: id => cards.remove(id),
+            html: (row) => row.remove()
+        }),
+        action(c.id, {
+            server: switchLearned,
+            local: id => cards.flip(id),
+            html: (row, data) => {
+                row.dataset.learned = data.learned
+                row.querySelector('.cell-learned').textContent = data.learned ? 'Learned' : 'Not learned'
+            }
+        })
+    )
 }
 
 const selectLearnable = (cards) => {
@@ -132,7 +135,7 @@ const updateLearnState = (reset = false) => {
     updateButtonsState()
 }
 
-const action = (id, {pre, server, local, html}) => {
+const action = (id = null, {pre, server, local, html} = {}) => {
     return async (ev) => {
         if (pre) pre(ev)
         try {
@@ -179,23 +182,20 @@ const handleFormSubmition = action(null, {
             editingCard = null
         }
     },
-    html: () => document.querySelectorAll('form input').forEach(i => i.value = ''),
+    html: () => {
+        document.querySelectorAll('form input').forEach(i => i.value = '')
+        document.querySelector('#flashcards-deck > tbody').appendChild(row(cards.deck[cards.deck.length - 1]))
+    },
 })
 
 window.onload = async () => {
     document.querySelectorAll('form input').forEach(i => i.value = '')
 
-    try {
-        cards.deck = await getCards()
-        learnData.deck = selectLearnable(cards.deck)
-
-        render(cards.deck)
-
-        updateLearnState()
-
-    } catch (e) {
-        console.error(e)
-    }
+    action(null, {
+        server: async () => await getCards(),
+        local: (id, data) => cards.deck = data,
+        html: () => render(cards.deck),
+    })()
 
     document.querySelector('form').onsubmit = handleFormSubmition
 
