@@ -1,4 +1,5 @@
 import Card from "./card.js";
+import Deck from "./deck.js";
 
 export async function postCard({question, answer}) {
     const resp = await fetch('/api/cards', {
@@ -52,8 +53,10 @@ export async function switchLearned(id) {
         throw new Error(data.error)
     }
 
-    return data
+    return new Card(data)
 }
+
+
 
 export async function postDeck({name}) {
     const resp = await fetch('/api/decks', {
@@ -70,7 +73,7 @@ export async function postDeck({name}) {
         throw new Error(data.error)
     }
 
-    return data
+    return new Deck(data)
 }
 
 export async function getDecks() {
@@ -82,5 +85,5 @@ export async function getDecks() {
         throw new Error(data.error)
     }
 
-    return data
+    return data.map(d => new Deck(d))
 }

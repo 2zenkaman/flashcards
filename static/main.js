@@ -2,13 +2,16 @@
 
 import Preview from "./preview.js";
 
-import {Deck, PointedDeck} from "./deck.js";
+import {Deck, PointedDeck} from "./decks.js";
 
 import handleFlipAnimation from "./animations.js";
-import {postCard, deleteCard, switchLearned, getCards} from "./api.js"
+import { postCard, deleteCard, switchLearned, getCards } from "./api.js"
+import { postDeck, getDecks } from "./api.js";
 
 const learnData = new PointedDeck()
 const cards = new Deck()
+
+const decks = []
 
 const render = (cardList) => {
     const table = document.querySelector('#flashcards-deck > tbody')
@@ -20,6 +23,7 @@ const render = (cardList) => {
 }
 
 let editingCard = null
+let currentDeck = null
 
 const getRow = (id) => {
     let row
@@ -61,6 +65,10 @@ const row = (c) => {
             }
         })
     )
+}
+
+const deck = (d) => {
+    return d.toElement()
 }
 
 const selectLearnable = (cards) => {
@@ -122,7 +130,7 @@ const action = (id = null, {pre, server, local, html} = {}) => {
     }
 }
 
-const handleFormSubmition = action(null, {
+const handleCardFormSubmition = action(null, {
     pre: (ev) => ev.preventDefault(),
     server: async () => {
         const req = {
@@ -146,29 +154,46 @@ const handleFormSubmition = action(null, {
     },
 })
 
+const handleNewDeckClick = action(null, {
+    html: () => {
+        const item = document.querySelector('.panel-group .new-deck')
+        if (item.querySelector('form')) return
+
+        const input = document.createElement('input')
+        input.type = 'text'
+
+        const form = document.createElement('form')
+        form.appendChild(input)
+        form.onsubmit = action(null, {
+            pre: (ev) => ev.preventDefault(),
+            server: async () => {
+                if (input.value.trim() === '') return
+                return await postDeck({name: input.value})
+            },
+            html: () => {
+                item.innerHTML = `<div class="unselectable">New deck</div>`
+            }
+        })
+
+        item.querySelector('div').replaceWith(form)
+        input.focus()
+    }
+})
+
 window.onload = async () => {
     document.querySelectorAll('form input').forEach(i => i.value = '')
 
     action(null, {
-        server: async () => await getCards(),
-        local: (id, data) => cards.deck = data,
-        html: () => render(cards.deck),
+        server: getDecks,
+        local: (id, data) => decks.push(...data),
+        html: () => {
+            const panelGroup = document.querySelector('.panel-group')
+            decks.forEach(d => panelGroup.appendChild(d.toElement()))
+        }
     })()
 
-    document.querySelector('.panel-item:last-child').onclick = () => {
-        if (!confirm('Are you sure you want to clear the deck?')) return
-
-        action(null, {
-            server: async () => {
-                const data = await getCards()
-                await Promise.all(data.map(c => deleteCard(c.id)))
-            },
-            local: () => cards.deck = [],
-            html: () => render(cards.deck),
-        })()
-    }
-
-    document.querySelector('form').onsubmit = handleFormSubmition
+    document.querySelector('.side-panel .new-deck').onclick = handleNewDeckClick
+    document.querySelector('.head form').onsubmit = handleCardFormSubmition
 
     document.querySelector('#shuffle').onclick = action(null, {
         local: () => cards.shuffle(),
