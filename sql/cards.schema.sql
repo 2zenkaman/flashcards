@@ -1,4 +1,4 @@
-CREATE TABLE cards (
+CREATE TABLE IF NOT EXISTS cards (
     id SERIAL PRIMARY KEY,
     deck_id INTEGER NOT NULL,
     question TEXT NOT NULL,
