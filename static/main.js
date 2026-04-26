@@ -143,13 +143,17 @@ const updateLearnState = (reset = false) => {
     updateButtonsState()
 }
 
+const updateCounterState = (data) => {
+    document.querySelector('#counter').textContent = `${data.p + 1} / ${data.deck.length}`
+    document.querySelector('#counter').hidden = data.deck.length === 0
+}
+
 // on every state update
 const post = () => {
     learnData.deck = selectLearnable(cards.deck)
     learnData.normalize()
     updateLearnState()
-    document.querySelector('#counter').textContent = `${learnData.p + 1} / ${learnData.deck.length}`
-    document.querySelector('#counter').hidden = learnData.deck.length === 0
+    updateCounterState(learnData)
 }
 
 const action = (id = null, {pre, server, local, html} = {}) => {
