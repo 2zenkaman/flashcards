@@ -80,7 +80,7 @@ const row = (c) => {
         }),
         onswitch: action({
             server: async () => await switchLearned(c.id, c.deck_id),
-            local: id => cards.flip(id),
+            local: data => cards.flip(data.id),
             html: (data) => {
                 c.getElement().dataset.learned = data.learned
                 c.getElement().querySelector('.cell-learned').textContent = data.learned ? 'Learned' : 'Not learned'
