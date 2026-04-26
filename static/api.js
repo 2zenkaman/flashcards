@@ -52,5 +52,5 @@ export async function switchLearned(id) {
         throw new Error(data.error)
     }
 
-    return data.learned
+    return data
 }

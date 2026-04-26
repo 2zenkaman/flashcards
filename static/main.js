@@ -25,6 +25,16 @@ let learnData = {
 let cards = {
     deck: [],
 
+    remove(id) {
+        this.deck = this.deck.filter(c => c.id !== id)
+    },
+
+    flip(id) {
+        this.deck.forEach((c, i, a) => {
+            if (c.id === id) a[i].learned = !a[i].learned
+        })
+    },
+ 
     render() {
         const table = document.querySelector('#flashcards-deck > tbody')
         table.innerHTML = ''
@@ -110,7 +120,7 @@ const handleFormSubmition = async (ev) => {
         const new_card = await postCard(req)
 
         cards.push(new_card)
-        learnData.deck = selectLearnable(cards)
+        learnData.deck = selectLearnable(cards.deck)
 
         // preserve learned state from edited card
         if (editingCard) {
@@ -119,13 +129,6 @@ const handleFormSubmition = async (ev) => {
         }
 
         updateLearnState()
-
-        const row = new_card.toElement(
-            handleDelete(new_card.id), 
-            handleEdit(new_card.id), 
-            handleSwitch(new_card.id)
-        )
-        document.querySelector('#flashcards-deck > tbody').appendChild(row)
 
         // clears inputs after card submition
         form.querySelectorAll('input').forEach(i => i.value = '')
@@ -142,8 +145,8 @@ const handleDelete = (id) => {
             await deleteCard(id)
 
             // delete card locally by id
-            cards = cards.filter(c => c.id !== id)
-            learnData.deck = selectLearnable(cards)
+            cards.remove(id)
+            learnData.deck = selectLearnable(cards.deck)
 
             // fix index if it's out of bounds
             if (learnData.p >= learnData.deck.length && learnData.deck.length > 0) {
@@ -174,11 +177,11 @@ const handleEdit = (id) => {
             await deleteCard(id)
 
             // delete card locally by id
-            cards = cards.filter(c => c.id !== id)
-            learnData.deck = selectLearnable(cards)
+            cards.remove(id)
+            learnData.deck = selectLearnable(cards.deck)
 
              // fix index if it's out of bounds
-             if (learnData.p >= learnData.deck.length && learnData.deck.length > 0) {
+            if (learnData.p >= learnData.deck.length && learnData.deck.length > 0) {
                 learnData.p = learnData.deck.length - 1
             }
 
@@ -199,9 +202,7 @@ const handleSwitch = (id) => {
             const data = await switchLearned(id)
 
             // switch learned state locally by id
-            cards.forEach((c, i, a) => {
-                if (c.id === id) a[i].learned = data.learned
-            })
+            cards.flip(id)
 
             // find row
             const row = getRow(id)
@@ -209,7 +210,7 @@ const handleSwitch = (id) => {
             row.dataset.learned = data.learned
             row.querySelector('.cell-learned').textContent = data.learned ? 'Learned' : 'Not learned'
 
-            learnData.deck = selectLearnable(cards)
+            learnData.deck = selectLearnable(cards.deck)
 
             updateButtonsState()
         } catch (e) {
@@ -219,7 +220,7 @@ const handleSwitch = (id) => {
 }
 
 const handleSelectMode = () => {
-    learnData.deck = selectLearnable(cards)
+    learnData.deck = selectLearnable(cards.deck)
     updateLearnState(true)
 }
 
@@ -227,8 +228,8 @@ window.onload = async () => {
     document.querySelectorAll('form input').forEach(i => i.value = '')
 
     try {
-        cards = await getCards()
-        learnData.deck = selectLearnable(cards)
+        cards.deck = await getCards()
+        learnData.deck = selectLearnable(cards.deck)
 
         cards.render()
 
