@@ -129,12 +129,11 @@ const updateButtonsState = () => {
     document.querySelector('#forward').disabled = learnData.deck.length - learnData.p <= 1
 }
 
-const updateLearnState = (reset = false) => {
+const updateLearnState = () => {
     const windowElement = document.querySelector('#flashcards-window')
     if (learnData.deck.length === 0) {
         windowElement.textContent = 'No cards'
     } else {
-        if (reset) learnData.p = 0
         windowElement.innerHTML = ''
         const preview = new Preview(learnData.current()).toElement()
         windowElement.append(preview)
