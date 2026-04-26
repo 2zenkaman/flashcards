@@ -14,13 +14,13 @@ func HandleCreateDeck() gin.HandlerFunc {
 		}
 
 		if err := ctx.ShouldBindJSON(&req); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid body request"})
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid body request:" + err.Error()})
 			return
 		}
 
 		deck := models.Deck{Name: req.Name}
 		if err := deck.Create(); err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create deck"})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create deck: " + err.Error()})
 			return
 		}
 
@@ -32,7 +32,7 @@ func HandleGetAllDecks() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		decks, err := models.GetAllDecks()
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get decks"})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get decks: " + err.Error()})
 			return
 		}
 
