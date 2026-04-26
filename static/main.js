@@ -132,7 +132,7 @@ const updateButtonsState = () => {
 const updateLearnState = () => {
     const windowElement = document.querySelector('#flashcards-window')
     if (learnData.deck.length === 0) {
-        windowElement.textContent = 'No cards'
+        windowElement.textContent = 'No cards to learn.'
     } else {
         windowElement.innerHTML = ''
         const preview = new Preview(learnData.current()).toElement()
