@@ -206,14 +206,10 @@ window.onload = async () => {
     document.querySelector('#flashcards-window').onclick = handleFlipAnimation(() => learnData.deck.length > 0)
 
     document.querySelector('#backward').onclick = action(null, {
-        server: null,
         local: () => learnData.decrement(),
-        html: () => updateLearnState()
     })
 
     document.querySelector('#forward').onclick = action(null, {
-        server: null,
         local: () => learnData.increment(),
-        html: () => updateLearnState()
     })
 }
