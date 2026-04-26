@@ -3,6 +3,7 @@ package handlers
 import (
 	"flashcards/models"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -37,5 +38,22 @@ func HandleGetAllDecks() gin.HandlerFunc {
 		}
 
 		ctx.JSON(http.StatusOK, decks)
+	}
+}
+
+func HandleDeleteDeck() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id, err := strconv.Atoi(ctx.Param("id"))
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse deck id: " + err.Error()})
+			return
+		}
+
+		if err := models.DeleteDeck(id); err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete deck: " + err.Error()})
+			return
+		}
+
+		ctx.Status(http.StatusNoContent)
 	}
 }

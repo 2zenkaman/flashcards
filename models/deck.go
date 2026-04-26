@@ -29,3 +29,8 @@ func GetAllDecks() ([]Deck, error) {
 
 	return decks, nil
 }
+
+func DeleteDeck(id int) error {
+	_, err := conn.Exec(context.Background(), "DELETE FROM decks WHERE id = $1", id)
+	return err
+}

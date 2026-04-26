@@ -25,6 +25,7 @@ func main() {
 
 	engine.Handle("POST", "/api/decks", handlers.HandleCreateDeck())
 	engine.Handle("GET", "/api/decks", handlers.HandleGetAllDecks())
+	engine.Handle("DELETE", "/api/decks/:id", handlers.HandleDeleteDeck())
 
 	engine.Run(":8080")
 }
