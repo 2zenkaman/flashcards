@@ -10,7 +10,7 @@ export default class Deck {
     toElement({onselect, ondelete}) {
         const preview = document.createElement('div')
         preview.classList.add('deck', 'unselectable')
-        preview.dataset.deckId = this.id
+        preview.dataset.deck_id = this.id
         preview.dataset.selected = false
         preview.innerHTML = `
             <div>${this.name}</div>
@@ -21,5 +21,9 @@ export default class Deck {
         preview.querySelector('.cell-delete').onclick = ondelete
     
         return preview
+    }
+
+    getElement() {
+        return document.querySelector(`.side-panel .deck[data-deck_id="${this.id}"]`)
     }
 }

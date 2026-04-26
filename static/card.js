@@ -32,4 +32,8 @@ export default class Card {
 
         return row;
     }
+
+    getElement() {
+        return document.querySelector(`.flashcards-row .cell-id:contains("${this.id}")`).parentElement
+    }
 }

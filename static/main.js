@@ -11,8 +11,6 @@ import { postDeck, getDecks, deleteDeck } from "./api.js";
 const learnData = new PointedDeck()
 const cards = new Deck()
 
-const decks = []
-
 const render = (cardList) => {
     const table = document.querySelector('#flashcards-deck > tbody')
     table.innerHTML = ''
@@ -23,17 +21,28 @@ const render = (cardList) => {
 }
 
 let editingCard = null
-let currentDeck = null
+let currentDeckID = null
 
-const getRow = (id) => {
-    let row
-    document.querySelectorAll('tr.flashcards-row').forEach(s => {
-        if (s.querySelector('.cell-id').innerHTML == id) {
-            row = s
+const action = ({pre, server, local, html} = {}, reset = false) => {
+    return async (ev) => {
+        if (pre) pre(ev)
+        try {
+            const data = server ? await server() : null
+            if (local) local(data)
+            if (html) html(data)
+            
+            learnData.data = selectLearnable(cards.data)
+            learnData.normalize()
+            updateLearnState()
+            updateCounterState(learnData)
+
+            if (reset) {
+                render(cards.data)
+            } 
+        } catch (e) {
+            console.error(e)
         }
-    })
-
-    return row
+    }
 }
 
 const row = (c) => {
@@ -41,7 +50,7 @@ const row = (c) => {
         ondelete: action({
             server: async () => await deleteCard(c.id, c.deck_id),
             local: id => cards.remove(id),
-            html: (row) => row.remove()
+            html: () => c.getElement().remove()
         }),
         onedit: action({
             pre: () => {
@@ -54,7 +63,7 @@ const row = (c) => {
             },
             server: async () => deleteCard(c.id, c.deck_id),
             local: () => cards.remove(c.id),
-            html: () => getRow(c.id).remove()
+            html: () => getRow(c.id).remove(),
         }),
         onswitch: action({
             server: switchLearned,
@@ -71,16 +80,19 @@ const deck = (d) => {
     return d.toElement({
         onselect: action({
             server: async () => await getCards(d.id),
-            local: data => currentDeck = data,
-            html: () => {
-                document.querySelectorAll('.side-panel .deck').forEach(s => s.dataset.selected = false)
-                document.querySelector(`.side-panel .deck[data-deck-id="${d.id}"]`).dataset.selected = true
+            local: data => {
+                currentDeckID = d.id
+                cards.deck = data
             },
-        }),
+            html: () => {
+                // highlight the selected deck
+                document.querySelectorAll('.side-panel .deck').forEach(s => s.dataset.selected = false)
+                document.querySelector(`.side-panel .deck[data-deck_id="${d.id}"]`).dataset.selected = true
+            },
+        }, reset = true),
         ondelete: action({
             server: async () => await deleteDeck(d.id),
-            local: id => decks.remove(id),
-            html: (data) => element.remove()
+            html: () => d.getElement().remove()
         })
     })
 }
@@ -97,12 +109,12 @@ const selectLearnable = (cards) => {
 
 const updateButtonsState = () => {
     document.querySelector('#backward').disabled = learnData.p === 0
-    document.querySelector('#forward').disabled = learnData.deck.length - learnData.p <= 1
+    document.querySelector('#forward').disabled = learnData.data.length - learnData.p <= 1
 }
 
 const updateLearnState = () => {
     const windowElement = document.querySelector('#flashcards-window')
-    if (learnData.deck.length === 0) {
+    if (learnData.data.length === 0) {
         windowElement.textContent = 'No cards to learn.'
     } else {
         windowElement.innerHTML = ''
@@ -114,30 +126,8 @@ const updateLearnState = () => {
 }
 
 const updateCounterState = (data) => {
-    document.querySelector('#counter').textContent = `${data.p + 1} / ${data.deck.length}`
-    document.querySelector('#counter').hidden = data.deck.length === 0
-}
-
-// on every state update
-const post = () => {
-    learnData.deck = selectLearnable(cards.deck)
-    learnData.normalize()
-    updateLearnState()
-    updateCounterState(learnData)
-}
-
-const action = ({pre, server, local, html} = {}) => {
-    return async (ev) => {
-        if (pre) pre(ev)
-        try {
-            const data = server ? await server() : null
-            if (local) local(data)
-            if (html) html(data)
-            post()
-        } catch (e) {
-            console.error(e)
-        }
-    }
+    document.querySelector('#counter').textContent = `${data.p + 1} / ${data.data.length}`
+    document.querySelector('#counter').hidden = data.data.length === 0
 }
 
 const handleCardFormSubmition = action({
@@ -148,9 +138,9 @@ const handleCardFormSubmition = action({
             answer:   document.querySelector('form input[name="answer"]').value.trim(),
         }
 
-        return await postCard(req)
+        return await postCard({deck_id: currentDeckID, ...req})
     },
-    local: (id, data) => {
+    local: (data) => {
         cards.push(data)
         
         if (editingCard) {
@@ -197,10 +187,9 @@ window.onload = async () => {
 
     action({
         server: async () => await getDecks(),
-        local: (data) => decks.push(...data),
-        html: () => {
+        html: (data) => {
             const panelGroup = document.querySelector('.panel-group')
-            decks.forEach(d => panelGroup.appendChild(deck(d)))
+            data.forEach(d => panelGroup.appendChild(deck(d)))
         }
     })()
 

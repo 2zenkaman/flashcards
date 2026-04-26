@@ -34,15 +34,17 @@ export class Deck {
     }
 }
 
-export class PointedDeck extends Deck {
+export class PointedDeck {
+    data = []
     p = 0
 
     constructor() {
-        super()
+        this.data = []
         this.p = 0
     }
     
     current() {
+        console.log(this.data, this.p)
         return this.data[this.p]
     }
     
