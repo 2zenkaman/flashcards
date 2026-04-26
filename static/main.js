@@ -5,61 +5,8 @@ import Preview from "./preview.js";
 import handleFlipAnimation from "./animations.js";
 import {postCard, deleteCard, switchLearned, getCards} from "./api.js"
 
-const learnData = {
-    deck: [],
-    p: 0,
-
-    current() {
-        return this.deck[this.p]
-    },
-
-    decrement() {
-        this.p = (((this.p - 1) % this.deck.length) + this.deck.length) % this.deck.length
-    },
-
-    increment() {
-        this.p = (this.p + 1) % this.deck.length
-    },
-
-    normalize() {
-        if (this.p >= this.deck.length) {
-            this.p = 0
-        }
-    }
-}
-
-const cards = {
-    deck: [],
-
-    remove(id) {
-        this.deck = this.deck.filter(c => c.id !== id)
-    },
-
-    flip(id) {
-        this.deck.forEach((c, i, a) => {
-            if (c.id === id) a[i].learned = !a[i].learned
-        })
-    },
-
-    find(id) {
-        return this.deck.find(c => c.id === id)
-    },
-
-    push(c) {
-        this.deck.push(c)
-    },
-
-    last() {
-        return this.deck[this.deck.length - 1]
-    },
-
-    shuffle() {
-        for (let i = this.deck.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [this.deck[i], this.deck[j]] = [this.deck[j], this.deck[i]];
-        }
-    }
-}
+const learnData = new PointedDeck()
+const cards = new Deck()
 
 const render = (cardList) => {
     const table = document.querySelector('#flashcards-deck > tbody')
