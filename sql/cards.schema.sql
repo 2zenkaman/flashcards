@@ -1,5 +1,6 @@
 CREATE TABLE cards (
     id SERIAL PRIMARY KEY,
+    deck_id INTEGER NOT NULL,
     question TEXT NOT NULL,
     answer TEXT NOT NULL,
     learned BOOLEAN NOT NULL DEFAULT FALSE
