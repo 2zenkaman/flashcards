@@ -157,6 +157,7 @@ const action = (id = null, {pre, server, local, html} = {}) => {
             learnData.deck = selectLearnable(cards.deck)
             learnData.normalize()
             updateLearnState()
+            document.querySelector('#counter').textContent = `${learnData.p + 1} / ${learnData.deck.length}`
         } catch (e) {
             console.error(e)
         }
@@ -200,7 +201,7 @@ window.onload = async () => {
 
     document.querySelector('#shuffle').onclick = action(null, {
         local: () => cards.shuffle(),
-        html: () => render(cards.deck)
+        html: () => render(cards.deck),
     })
 
     // empty action updates the learnable deck and learn state, so it is used for checkboxes
