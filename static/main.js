@@ -155,6 +155,19 @@ window.onload = async () => {
         html: () => render(cards.deck),
     })()
 
+    document.querySelector('.panel-item:last-child').onclick = () => {
+        if (!confirm('Are you sure you want to clear the deck?')) return
+
+        action(null, {
+            server: async () => {
+                const data = await getCards()
+                await Promise.all(data.map(c => deleteCard(c.id)))
+            },
+            local: () => cards.deck = [],
+            html: () => render(cards.deck),
+        })()
+    }
+
     document.querySelector('form').onsubmit = handleFormSubmition
 
     document.querySelector('#shuffle').onclick = action(null, {
